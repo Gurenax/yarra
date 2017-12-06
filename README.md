@@ -13,13 +13,13 @@ const server = express()
 server.use(bodyParser.json())
 
 // Routes
-server.use('/',[
+server.use('/', [
   // require('./routes/rainfall')
 ])
 
 // Start the server
-server.listen(7000, (error) => {
-  if(error) console.error('Error starting', error)
+server.listen(7000, error => {
+  if (error) console.error('Error starting', error)
   else console.log('Started at http://localhost:7000')
 })
 ```
@@ -31,4 +31,27 @@ server.listen(7000, (error) => {
 }
 ```
 
-5. 
+5. `yarn add mongoose`
+
+6. Add model\init.js
+```javascript
+const mongoose = require('mongoose')
+
+// Use the Promise functionality built into Node.js
+mongoose.Promise = global.Promise
+
+// Connect to our local database
+mongoose
+  .connect('mongodb://localhost/storms', { useMongoClient: true })
+  .then(() => {
+    console.log('Successfully connected to database')
+  })
+  .catch(error => {
+    //   If there was an error connecting to the database
+    if (error) console.log('Error connecting to MongoDB database', error)
+  })
+
+module.exports = mongoose
+```
+
+7. 

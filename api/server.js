@@ -7,12 +7,12 @@ const server = express()
 server.use(bodyParser.json())
 
 // Routes
-server.use('/',[
+server.use('/', [
   // require('./routes/rainfall')
 ])
 
 // Start the server
-server.listen(7000, (error) => {
-  if(error) console.error('Error starting', error)
+server.listen(7000, error => {
+  if (error) console.error('Error starting', error)
   else console.log('Started at http://localhost:7000')
 })
