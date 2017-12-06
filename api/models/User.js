@@ -1,5 +1,5 @@
 const mongoose = require('./init')
-const passportLocalMongoose = require('passport-local-mongoose');
+const passportLocalMongoose = require('passport-local-mongoose')
 
 const userSchema = new mongoose.Schema({
   firstName: String,
@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose, {
   usernameField: 'email', // Use email, not the default 'username'
   usernameLowerCase: true, // Ensure that all emails are lowercase
-  session: false, // Disable sessions as we'll use JWTs
-});
+  session: false // Disable sessions as we'll use JWTs
+})
 
 const User = mongoose.model('User', userSchema)
 
