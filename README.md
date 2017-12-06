@@ -66,8 +66,85 @@ module.exports = mongoose
 }
 ```
 
-## Models
+10. Create routes
+11. Add routes to server.js
 
+12. Add passport middleware `yarn add passport passport-local passport-local-mongoose`
+
+13. Add User model with Passport plugin
+```javascript
+const mongoose = require('./init')
+const passportLocalMongoose = require('passport-local-mongoose')
+
+const userSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String
+})
+
+// Add passport middleware to User Schema
+userSchema.plugin(passportLocalMongoose, {
+  usernameField: 'email', // Use email, not the default 'username'
+  usernameLowerCase: true, // Ensure that all emails are lowercase
+  session: false // Disable sessions as we'll use JWTs
+})
+
+const User = mongoose.model('User', userSchema)
+
+module.exports = User
+```
+
+14. Add User route
+```javascript
+const mongoose = require('./init')
+const passportLocalMongoose = require('passport-local-mongoose')
+
+const userSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String
+})
+
+// Add passport middleware to User Schema
+userSchema.plugin(passportLocalMongoose, {
+  usernameField: 'email', // Use email, not the default 'username'
+  usernameLowerCase: true, // Ensure that all emails are lowercase
+  session: false // Disable sessions as we'll use JWTs
+})
+
+const User = mongoose.model('User', userSchema)
+
+module.exports = User
+```
+
+15. Add Auth middleware `middleware/auth.js`
+```javascript
+const User = require('../models/User')
+
+function register(req, res, next) {
+  const user = new User({
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  })
+  // Create the user with the specified password
+  User.register(user, req.body.password, (error, user) => {
+    if (error) {
+      // Our register middleware failed
+      next(error)
+      return
+    }
+    // Store user so we can access it in our handler
+    req.user = user
+    // Success!
+    next()
+  })
+}
+
+module.exports = {
+  register
+}
+```
+
+## Models
 ### Product
 - name: string
 - brandName: string
