@@ -144,6 +144,10 @@ module.exports = {
 }
 ```
 
+16. `yarn add passport-jwt`
+
+
+
 ## Models
 ### Product
 - name: string

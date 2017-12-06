@@ -1,7 +1,9 @@
 const passport = require('passport')
 const JWT = require('jsonwebtoken')
+const PassportJwt = require('passport-jwt')
 const User = require('../models/User')
 
+// These should be in .env
 // secret (generated using `openssl rand -base64 48` from console)
 const jwtSecret = 'Z4rxmCFgxGUmworqbzQP01EJAOEIPAVoFcs3MIQpiio+q1G4+PFYQi095IRdsTE0'
 const jwtAlgorithm = 'HS256'
@@ -29,6 +31,38 @@ function register(req, res, next) {
   })
 }
 
+passport.use(new PassportJwt.Strategy(
+  // Options
+  {
+    // Where will the JWT be passed in the HTTP request?
+    // e.g. Authorization: Bearer xxxxxxxxxx
+    jwtFromRequest: PassportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    // What is the secret
+    secretOrKey: jwtSecret,
+    // What algorithm(s) were used to sign it?
+    algorithms: [jwtAlgorithm]
+  },
+  // When we have a verified token
+  (payload, done) => {
+    // Find the real user from our database using the `id` in the JWT
+    User.findById(payload.sub)
+      .then(user => {
+        // If user was found with this id
+        if(user) {
+          done(null, user)
+        }
+        // If not user was found
+        else {
+          done(null, false)
+        }
+      })
+      .catch(error => {
+        // If there was failure
+        done(error, false)
+      })
+  }
+))
+
 function signJWTForUser(req, res) {
   // Get the user (either just signed in or signed up)
   const user = req.user
@@ -54,5 +88,6 @@ module.exports = {
   initialize: passport.initialize(),
   register,
   signIn: passport.authenticate('local', { session: false }),
+  requireJWT: passport.authenticate('jwt', { session: false }),
   signJWTForUser
 }

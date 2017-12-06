@@ -1,9 +1,11 @@
 const express = require('express')
 const Product = require('../models/product')
+const authMiddleware = require('../middleware/auth')
+
 const router = express.Router()
 
 // GET - Read all product
-router.get('/products', (req, res) => {
+router.get('/products', authMiddleware.requireJWT, (req, res) => {
   Product.find()
   // Once it has loaded these documents
   .then(products => {
