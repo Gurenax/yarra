@@ -54,4 +54,20 @@ mongoose
 module.exports = mongoose
 ```
 
-7. 
+7. Create models
+8. Add drop and seeds files
+9. Modify scripts in package.json
+```javascript
+"scripts": {
+  "dev": "nodemon server.js",
+  "seed": "node models/seeds.js",
+  "drop": "node models/drop.js",
+  "reset": "npm run drop && npm run seed"
+}
+```
+
+## Models
+
+### Product
+- name: string
+- brandName: string
