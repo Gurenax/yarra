@@ -8,7 +8,8 @@ server.use(bodyParser.json())
 
 // Routes
 server.use('/', [
-  require('./routes/product')
+  require('./routes/product'),
+  require('./routes/auth'),
 ])
 
 // Start the server
