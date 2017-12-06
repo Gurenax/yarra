@@ -93,31 +93,20 @@ const User = mongoose.model('User', userSchema)
 module.exports = User
 ```
 
-14. Add User route
+14. Add Auth route
 ```javascript
-const mongoose = require('./init')
-const passportLocalMongoose = require('passport-local-mongoose')
-
-const userSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String
-})
-
-// Add passport middleware to User Schema
-userSchema.plugin(passportLocalMongoose, {
-  usernameField: 'email', // Use email, not the default 'username'
-  usernameLowerCase: true, // Ensure that all emails are lowercase
-  session: false // Disable sessions as we'll use JWTs
-})
-
-const User = mongoose.model('User', userSchema)
-
-module.exports = User
-```
-
-15. Add Auth middleware `middleware/auth.js`
-```javascript
+const passport = require('passport')
+const JWT = require('jsonwebtoken')
+const PassportJwt = require('passport-jwt')
 const User = require('../models/User')
+
+// These should be in .env
+// secret (generated using `openssl rand -base64 48` from console)
+const jwtSecret = 'Z4rxmCFgxGUmworqbzQP01EJAOEIPAVoFcs3MIQpiio+q1G4+PFYQi095IRdsTE0'
+const jwtAlgorithm = 'HS256'
+const jwtExpiresIn = '7 days'
+
+passport.use(User.createStrategy())
 
 function register(req, res, next) {
   const user = new User({
@@ -139,14 +128,187 @@ function register(req, res, next) {
   })
 }
 
+passport.use(new PassportJwt.Strategy(
+  // Options
+  {
+    // Where will the JWT be passed in the HTTP request?
+    // e.g. Authorization: Bearer xxxxxxxxxx
+    jwtFromRequest: PassportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    // What is the secret
+    secretOrKey: jwtSecret,
+    // What algorithm(s) were used to sign it?
+    algorithms: [jwtAlgorithm]
+  },
+  // When we have a verified token
+  (payload, done) => {
+    // Find the real user from our database using the `id` in the JWT
+    User.findById(payload.sub)
+      .then(user => {
+        // If user was found with this id
+        if(user) {
+          done(null, user)
+        }
+        // If not user was found
+        else {
+          done(null, false)
+        }
+      })
+      .catch(error => {
+        // If there was failure
+        done(error, false)
+      })
+  }
+))
+
+function signJWTForUser(req, res) {
+  // Get the user (either just signed in or signed up)
+  const user = req.user
+  // Create a signed token
+  const token = JWT.sign(
+    // payload
+    {
+      email: user.email
+    },
+    // secret
+    jwtSecret,
+    {
+      algorithm: jwtAlgorithm,
+      expiresIn: jwtExpiresIn,
+      subject: user._id.toString()
+    }
+  )
+  // Send the token
+  res.json({ token })
+}
+
 module.exports = {
-  register
+  initialize: passport.initialize(),
+  register,
+  signIn: passport.authenticate('local', { session: false }),
+  requireJWT: passport.authenticate('jwt', { session: false }),
+  signJWTForUser
+}
+```
+
+15. Add Auth middleware `middleware/auth.js`
+```javascript
+const passport = require('passport')
+const JWT = require('jsonwebtoken')
+const PassportJwt = require('passport-jwt')
+const User = require('../models/User')
+
+// These should be in .env
+// secret (generated using `openssl rand -base64 48` from console)
+const jwtSecret = 'Z4rxmCFgxGUmworqbzQP01EJAOEIPAVoFcs3MIQpiio+q1G4+PFYQi095IRdsTE0'
+const jwtAlgorithm = 'HS256'
+const jwtExpiresIn = '7 days'
+
+passport.use(User.createStrategy())
+
+function register(req, res, next) {
+  const user = new User({
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  })
+  // Create the user with the specified password
+  User.register(user, req.body.password, (error, user) => {
+    if (error) {
+      // Our register middleware failed
+      next(error)
+      return
+    }
+    // Store user so we can access it in our handler
+    req.user = user
+    // Success!
+    next()
+  })
+}
+
+passport.use(new PassportJwt.Strategy(
+  // Options
+  {
+    // Where will the JWT be passed in the HTTP request?
+    // e.g. Authorization: Bearer xxxxxxxxxx
+    jwtFromRequest: PassportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    // What is the secret
+    secretOrKey: jwtSecret,
+    // What algorithm(s) were used to sign it?
+    algorithms: [jwtAlgorithm]
+  },
+  // When we have a verified token
+  (payload, done) => {
+    // Find the real user from our database using the `id` in the JWT
+    User.findById(payload.sub)
+      .then(user => {
+        // If user was found with this id
+        if(user) {
+          done(null, user)
+        }
+        // If not user was found
+        else {
+          done(null, false)
+        }
+      })
+      .catch(error => {
+        // If there was failure
+        done(error, false)
+      })
+  }
+))
+
+function signJWTForUser(req, res) {
+  // Get the user (either just signed in or signed up)
+  const user = req.user
+  // Create a signed token
+  const token = JWT.sign(
+    // payload
+    {
+      email: user.email
+    },
+    // secret
+    jwtSecret,
+    {
+      algorithm: jwtAlgorithm,
+      expiresIn: jwtExpiresIn,
+      subject: user._id.toString()
+    }
+  )
+  // Send the token
+  res.json({ token })
+}
+
+module.exports = {
+  initialize: passport.initialize(),
+  register,
+  signIn: passport.authenticate('local', { session: false }),
+  requireJWT: passport.authenticate('jwt', { session: false }),
+  signJWTForUser
 }
 ```
 
 16. `yarn add passport-jwt`
 
+17. Update server.js routes
 
+18. Update product routes to use JWT
+```javascript
+const authMiddleware = require('../middleware/auth')
+```
+```javascript
+// GET - Read all product
+router.get('/products', authMiddleware.requireJWT, (req, res) => {
+  Product.find()
+  // Once it has loaded these documents
+  .then(products => {
+    // Send them back as the response
+    res.json(products)
+  })
+  .catch(error => {
+    res.status(400).json({ error: error.message })
+  })
+})
+```
 
 ## Models
 ### Product
