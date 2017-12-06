@@ -28,6 +28,7 @@ Product.create([
 ])
   .then(products => {
     console.log('Created products', products)
+    process.exit()
   })
   .catch(error => {
     console.error('Error', error)
