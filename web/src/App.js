@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
-import ProductCreate from './components/ProductCreate'
+import ProductForm from './components/ProductForm'
 import { signIn, signOutNow, signUpNow } from './api/auth'
-import { listProducts, addProduct } from './api/product'
+import { listProducts, addProduct, getProduct, updateProduct } from './api/product'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css';
@@ -13,7 +13,12 @@ class App extends Component {
   state = {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
     showSignUpForm: false,
-    products: null
+    products: null,
+    currentProduct: {
+      id: '',
+      brandName: '',
+      name: ''
+    }
   }
 
   onSignIn = ({ email, password }) => {
@@ -43,17 +48,76 @@ class App extends Component {
       })
   }
 
-  onProductAdd = (data) => {
-    console.log('Adding product..', data)
-    addProduct(data).then( product => {
-      this.setState( prevState => {
-        const newProducts = [...prevState.products, product]
-        console.log('new products', newProducts)
-        return {
-          products: newProducts
-        }
+  onProductSave = (data) => {
+    console.log('Saving product..', data)
+    if(data.id) {
+      updateProduct(data).then( product => {
+        this.setState( prevState => {
+          const prevProducts = prevState.products
+          const updatedProducts = prevProducts.map( (item) => {
+            console.log(item._id, product._id)
+            console.log(typeof item._id, typeof product._id)
+            if (item._id === product._id) {
+              const copy = {
+                ...item,
+                name: product.name,
+                brandName: product.brandName
+              }
+              return copy
+            }
+            else {
+              return item
+            }
+          })
+          console.log('saved products', updatedProducts)
+          return {
+            products: updatedProducts
+          }
+        })
+        // this.loadProductsList()
+      })
+    }
+    else {
+      addProduct(data).then( product => {
+        this.setState( prevState => {
+          const newProducts = [...prevState.products, product]
+          console.log('saved products', newProducts)
+          return {
+            products: newProducts
+          }
+        })
+        // this.loadProductsList()
+      })
+    }
+  }
+
+  onProductGet = (event) => {
+    const productId = event.target.name
+    console.log('Getting product...', productId)
+    getProduct(productId).then( currentProduct => {
+      console.log('Found product', currentProduct)
+      this.setState({
+        currentProduct
       })
     })
+  }
+
+  onInputChange = (event) => {
+    const {name, value} = event.target
+    switch(name) {
+      case 'name':
+        this.setState( prevState => {
+          const oldCurrentProduct = prevState.currentProduct
+          return { currentProduct: { ...oldCurrentProduct, name: value } }
+        })
+        break
+      case 'brandName':
+        this.setState( prevState => {
+          const oldCurrentProduct = prevState.currentProduct
+          return { currentProduct: { ...oldCurrentProduct, brandName: value } }
+        })
+        break
+    }
   }
 
   toggleSignUp = () => {
@@ -65,8 +129,21 @@ class App extends Component {
     })
   }
 
+  loadProductsList = () => {
+    listProducts()
+    .then( products => {
+      console.log('loaded products', products)
+      this.setState({
+        products
+      })
+    })
+    .catch( error => {
+      console.error('error loading products', error)
+    })
+  }
+
   render() {
-    const { decodedToken, showSignUpForm, products } = this.state
+    const { decodedToken, showSignUpForm, products, currentProduct } = this.state
 
     return (
       <div>
@@ -111,7 +188,7 @@ class App extends Component {
           {
             !!decodedToken && (
               !!products ? (
-                <ProductsList products={products} />
+                <ProductsList products={products} onClickGetProduct={this.onProductGet} />
               ) :
               (
                 <span>Loading...</span>
@@ -121,7 +198,7 @@ class App extends Component {
 
           {
             !!decodedToken && (
-              <ProductCreate onProductAdd={this.onProductAdd} />
+              <ProductForm onProductSave={this.onProductSave} currentProduct={currentProduct} onInputChange={this.onInputChange} />
             )
           }
         </div>
@@ -131,16 +208,7 @@ class App extends Component {
 
   // WHen this App first appears on screen
   componentDidMount() {
-    listProducts()
-      .then( products => {
-        console.log('loaded products', products)
-        this.setState({
-          products
-        })
-      })
-      .catch( error => {
-        console.error('error loading products', error)
-      })
+    this.loadProductsList()
   }
 }
 
