@@ -48,6 +48,18 @@ class App extends Component {
       })
   }
 
+  onProductNew = (event) => {
+    console.log('New product..')
+    event.preventDefault()
+    this.setState({
+      currentProduct: {
+        id: '',
+        brandName: '',
+        name: ''
+      }
+    })
+  }
+
   onProductSave = (data) => {
     console.log('Saving product..', data)
     if(data.id) {
@@ -70,7 +82,12 @@ class App extends Component {
           })
           console.log('saved products', updatedProducts)
           return {
-            products: updatedProducts
+            products: updatedProducts,
+            currentProduct: {
+              id: '',
+              brandName: '',
+              name: ''
+            }
           }
         })
         // this.loadProductsList()
@@ -82,7 +99,12 @@ class App extends Component {
           const newProducts = [...prevState.products, product]
           console.log('saved products', newProducts)
           return {
-            products: newProducts
+            products: newProducts,
+            currentProduct: {
+              id: '',
+              brandName: '',
+              name: ''
+            }
           }
         })
         // this.loadProductsList()
@@ -91,6 +113,7 @@ class App extends Component {
   }
 
   onProductGet = (event) => {
+    event.preventDefault()
     const productId = event.target.name
     console.log('Getting product...', productId)
     getProduct(productId).then( currentProduct => {
@@ -197,7 +220,7 @@ class App extends Component {
 
           {
             !!decodedToken && (
-              <ProductForm onProductSave={this.onProductSave} currentProduct={currentProduct} onInputChange={this.onInputChange} />
+              <ProductForm onProductNew={this.onProductNew} onProductSave={this.onProductSave} currentProduct={currentProduct} onInputChange={this.onInputChange} />
             )
           }
         </div>
