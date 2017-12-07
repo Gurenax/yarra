@@ -26,12 +26,12 @@ const SignUpForm = ({ onSignUp }) => {
 
       <label className="mb-2">
         {'First Name: '}
-        <input type="firstName" name="firstName" />
+        <input type="text" name="firstName" />
       </label>
 
       <label className="mb-2">
         {'Last Name: '}
-        <input type="lastName" name="lastName" />
+        <input type="text" name="lastName" />
       </label>
 
       <label className="mb-2">

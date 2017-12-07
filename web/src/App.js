@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
+import ProductCreate from './components/ProductCreate'
 import { signIn, signOutNow, signUpNow } from './api/auth'
-import { listProducts } from './api/product'
+import { listProducts, addProduct } from './api/product'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css';
@@ -12,7 +13,7 @@ class App extends Component {
   state = {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
     showSignUpForm: false,
-    products: []
+    products: null
   }
 
   onSignIn = ({ email, password }) => {
@@ -40,6 +41,19 @@ class App extends Component {
           }
         })
       })
+  }
+
+  onProductAdd = (data) => {
+    console.log('Adding product..', data)
+    addProduct(data).then( product => {
+      this.setState( prevState => {
+        const newProducts = [...prevState.products, product]
+        console.log('new products', newProducts)
+        return {
+          products: newProducts
+        }
+      })
+    })
   }
 
   toggleSignUp = () => {
@@ -95,8 +109,19 @@ class App extends Component {
           }
 
           {
-            !!decodedToken && !!products && (
-              <ProductsList products={products} />
+            !!decodedToken && (
+              !!products ? (
+                <ProductsList products={products} />
+              ) :
+              (
+                <span>Loading...</span>
+              )
+            )
+          }
+
+          {
+            !!decodedToken && (
+              <ProductCreate onProductAdd={this.onProductAdd} />
             )
           }
         </div>
