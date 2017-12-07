@@ -19,6 +19,6 @@ export const setToken = (token) => {
 
 // Validates the token, and if it's invalid, remove from local storage
 // (e.g. expired, modified)
-rememberToken(getValidToken())
+setToken(getValidToken())
 
 export default api
