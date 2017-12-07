@@ -4,6 +4,10 @@ import SignInForm from './components/SignInForm'
 import './App.css';
 
 class App extends Component {
+  onSignIn = ({ email, password }) => {
+    console.log('App received', { email, password })
+  }
+
   render() {
     return (
       <div>
@@ -13,8 +17,9 @@ class App extends Component {
         </div>
         <div className="App container-fluid">
           
-
-          <SignInForm />
+          <SignInForm
+            onSignIn={ this.onSignIn }
+          />
 
         </div>
       </div>
