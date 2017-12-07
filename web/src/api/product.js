@@ -23,3 +23,7 @@ export const updateProduct = (product) => {
       return newProduct
     })
 }
+
+export const deleteProduct = (productId) => {
+  return api.delete(`/products/${productId}`).then(res => res.data)
+}

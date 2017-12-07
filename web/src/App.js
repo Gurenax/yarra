@@ -8,7 +8,8 @@ import {
   listProducts,
   addProduct,
   getProduct,
-  updateProduct
+  updateProduct,
+  deleteProduct
 } from './api/product'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
@@ -171,6 +172,32 @@ class App extends Component {
     })
   }
 
+  onProductDelete = event => {
+    event.preventDefault()
+    const productId = event.target.name
+    console.log('Deleting product...', productId)
+    deleteProduct(productId).then(currentProduct => {
+      console.log('Deleted product', currentProduct)
+      this.setState(prevState => {
+        const prevProducts = prevState.products
+        // Filter only products which are not deleted
+        const updatedProducts = prevProducts.filter(item => item._id !== productId)
+        console.log('saved products', updatedProducts)
+        return {
+          products: updatedProducts,
+          currentProduct: {
+            id: '',
+            brandName: '',
+            name: ''
+          },
+          errors: {
+            productSaveError: null
+          }
+        }
+      })
+    })
+  }
+
   onInputChange = event => {
     const { name, value } = event.target
     switch (name) {
@@ -276,6 +303,7 @@ class App extends Component {
               <ProductsList
                 products={products}
                 onClickGetProduct={this.onProductGet}
+                onClickDeleteProduct={this.onProductDelete}
               />
             ) : (
               <span>Loading...</span>
