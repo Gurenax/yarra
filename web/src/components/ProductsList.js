@@ -7,7 +7,7 @@ const ProductsList = ({ products, onClickGetProduct, onClickDeleteProduct }) => 
     {
       products.map( (product, index) => (
           <li key={product._id}>
-            <a onClick={onClickGetProduct} name={product._id} href="#">{product.brandName} {product.name}</a> | <a href="#" name={product._id} onClick={onClickDeleteProduct}>Delete</a>
+            {product.brandName} {product.name} | <a onClick={onClickGetProduct} name={product._id} href="#">Edit</a> | <a href="#" name={product._id} onClick={onClickDeleteProduct}>Delete</a>
           </li>
         )
       )
