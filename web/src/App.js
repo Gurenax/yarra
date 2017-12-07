@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
+import ProductsList from './components/ProductsList'
 import { signIn, signOutNow, signUpNow } from './api/auth'
 import { listProducts } from './api/product'
 import { getDecodedToken } from './api/token'
+// import { setToken } from './api/init'
 import './App.css';
 
 class App extends Component {
   state = {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
-    showSignUpForm: false
+    showSignUpForm: false,
+    products: []
   }
 
   onSignIn = ({ email, password }) => {
@@ -49,7 +52,7 @@ class App extends Component {
   }
 
   render() {
-    const { decodedToken, showSignUpForm } = this.state
+    const { decodedToken, showSignUpForm, products } = this.state
 
     return (
       <div>
@@ -90,6 +93,12 @@ class App extends Component {
               </div>
             )
           }
+
+          {
+            !!decodedToken && !!products && (
+              <ProductsList products={products} />
+            )
+          }
         </div>
       </div>
     );
@@ -100,6 +109,9 @@ class App extends Component {
     listProducts()
       .then( products => {
         console.log('loaded products', products)
+        this.setState({
+          products
+        })
       })
       .catch( error => {
         console.error('error loading products', error)
