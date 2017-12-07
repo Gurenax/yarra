@@ -14,3 +14,13 @@ export const signIn = ({ email, password }) => {
 export const signOutNow = () => {
   setToken(null)
 }
+
+export const signUpNow = (data) => {
+  return api.post('/auth/register', data)
+    .then( res => {
+      const token = res.data.token
+      setToken(token)
+      // Converts token back to a human readable JSON
+      return getDecodedToken()
+    })
+}

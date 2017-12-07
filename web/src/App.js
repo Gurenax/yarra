@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import SignInForm from './components/SignInForm'
-import { signIn, signOutNow } from './api/auth'
+import SignUpForm from './components/SignUpForm'
+import { signIn, signOutNow, signUpNow } from './api/auth'
 import { listProducts } from './api/product'
 import { getDecodedToken } from './api/token'
 import './App.css';
 
 class App extends Component {
   state = {
-    decodedToken: getDecodedToken() // Restore the previous signed in data
+    decodedToken: getDecodedToken(), // Restore the previous signed in data
+    showSignUpForm: false
   }
 
   onSignIn = ({ email, password }) => {
@@ -24,8 +26,30 @@ class App extends Component {
     this.setState({ decodedToken: null })
   }
 
+  onSignUp = (data) => {
+    signUpNow(data)
+      .then( decodedToken => {
+        console.log('signed up', decodedToken)
+        this.setState( prevState => {
+          return {
+            decodedToken,
+            showSignUpForm: false
+          }
+        })
+      })
+  }
+
+  toggleSignUp = () => {
+    console.log('Signing up..')
+    // showSignUpForm()
+    this.setState( prevState => {
+      const signedUpShown = prevState.showSignUpForm
+      return { showSignUpForm: !signedUpShown }
+    })
+  }
+
   render() {
-    const { decodedToken } = this.state
+    const { decodedToken, showSignUpForm } = this.state
 
     return (
       <div>
@@ -43,9 +67,27 @@ class App extends Component {
                 <button className='btn btn-primary' onClick={ this.onSignOut } >Sign Out</button>
               </div>
             ) : (
-              <SignInForm
-                onSignIn={ this.onSignIn }
-              />
+              !showSignUpForm && (
+              <div>
+                <SignInForm
+                  onSignIn={ this.onSignIn }
+                />
+                <button className="mt-1 btn btn-primary" onClick={ this.toggleSignUp } >
+                  Register
+                </button>
+              </div>
+              )
+            )
+          }
+          
+          {
+            !!showSignUpForm && (
+              <div>
+                <SignUpForm onSignUp={this.onSignUp} />
+                <button className="mt-1 btn btn-primary" onClick={ this.toggleSignUp } >
+                  Back to Sign In
+                </button>
+              </div>
             )
           }
         </div>
