@@ -18,7 +18,7 @@ router.get('/products', authMiddleware.requireJWT, (req, res) => {
 })
 
 // GET - Read an individual product document
-router.get('/products/:id', (req, res) => {
+router.get('/products/:id', authMiddleware.requireJWT, (req, res) => {
   const id = req.params.id
   // Ask the model for the document with this id
   Product.findById(id)
@@ -40,7 +40,7 @@ router.get('/products/:id', (req, res) => {
 })
 
 // POST - Create a new product document
-router.post('/products', (req, res) => {
+router.post('/products', authMiddleware.requireJWT, (req, res) => {
   const attributes = req.body
   Product.create(attributes)
     .then(product => {
@@ -52,7 +52,7 @@ router.post('/products', (req, res) => {
 })
 
 // PATCH - Update a product document
-router.patch('/products/:id', (req, res) => {
+router.patch('/products/:id', authMiddleware.requireJWT, (req, res) => {
   const id = req.params.id
   const attributes = req.body
   Product.findByIdAndUpdate(id, attributes, { new: true, runValidators: true })
@@ -72,7 +72,7 @@ router.patch('/products/:id', (req, res) => {
 })
 
 // DELETE - Destroy a product document
-router.delete('/products/:id', (req, res) => {
+router.delete('/products/:id', authMiddleware.requireJWT, (req, res) => {
   const id = req.params.id
   Product.findByIdAndRemove(id)
     .then(product => {
