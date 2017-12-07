@@ -25,7 +25,8 @@ class App extends Component {
       name: ''
     },
     errors: {
-      signInError: null
+      signInError: null,
+      productSaveError: null
     }
   }
 
@@ -87,11 +88,22 @@ class App extends Component {
         id: '',
         brandName: '',
         name: ''
+      },
+      errors: {
+        productSaveError: null
       }
     })
   }
 
   onProductSave = data => {
+    if (!data.brandName || !data.name) {
+      this.setState({
+        errors: {
+          productSaveError: 'Invalid product'
+        }
+      })
+      return
+    }
     console.log('Saving product..', data)
     if (data.id) {
       updateProduct(data).then(product => {
@@ -117,6 +129,9 @@ class App extends Component {
               id: '',
               brandName: '',
               name: ''
+            },
+            errors: {
+              productSaveError: null
             }
           }
         })
@@ -133,6 +148,9 @@ class App extends Component {
               id: '',
               brandName: '',
               name: ''
+            },
+            errors: {
+              productSaveError: null
             }
           }
         })
@@ -269,6 +287,7 @@ class App extends Component {
               onProductSave={this.onProductSave}
               currentProduct={currentProduct}
               onInputChange={this.onInputChange}
+              errorMessage={errors.productSaveError}
             />
           )}
         </div>
@@ -278,8 +297,8 @@ class App extends Component {
 
   // WHen this App first appears on screen
   componentDidMount() {
-    const {decodedToken} = this.state
-    if(decodedToken) {
+    const { decodedToken } = this.state
+    if (decodedToken) {
       this.loadProductsList()
     }
   }
