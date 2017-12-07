@@ -310,6 +310,10 @@ router.get('/products', authMiddleware.requireJWT, (req, res) => {
 })
 ```
 
+## React
+
+1. `yarn add jwt-decode`
+
 ## Models
 ### Product
 - name: string

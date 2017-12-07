@@ -1,12 +1,12 @@
-import api from './init'
-import decodeJWT from 'jwt-decode'
+import api, { setToken } from './init'
+import { getDecodedToken } from './token'
 
 export const signIn = ({ email, password }) => {
   return api.post('/auth', { email, password })
     .then( res => {
       const token = res.data.token
+      setToken(token)
       // Converts token back to a human readable JSON
-      const decodedToken = decodeJWT(token)
-      return decodedToken
+      return getDecodedToken()
     })
 }
