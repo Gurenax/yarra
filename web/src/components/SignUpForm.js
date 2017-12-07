@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SignUpForm = ({ onSignUp }) => {
+const SignUpForm = ({ onSignUp, onBackToSignIn }) => {
   return (
     <form
       onSubmit={event => {
@@ -39,7 +39,13 @@ const SignUpForm = ({ onSignUp }) => {
         <input type="password" name="password" />
       </label>
 
-      <button className="btn btn-primary">Sign Up</button>
+      <button className="btn btn-primary mr-1">Sign Up</button>
+      <button
+        className="btn btn-primary"
+        onClick={onBackToSignIn}
+      >
+        Back to Sign In
+      </button>
     </form>
   )
 }

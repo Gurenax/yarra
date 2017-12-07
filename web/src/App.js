@@ -1,13 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
 import ProductForm from './components/ProductForm'
 import { signIn, signOutNow, signUpNow } from './api/auth'
-import { listProducts, addProduct, getProduct, updateProduct } from './api/product'
+import {
+  listProducts,
+  addProduct,
+  getProduct,
+  updateProduct
+} from './api/product'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
-import './App.css';
+import './App.css'
 
 class App extends Component {
   state = {
@@ -18,16 +23,43 @@ class App extends Component {
       id: '',
       brandName: '',
       name: ''
+    },
+    errors: {
+      signInError: null
     }
   }
 
-  onSignIn = ({ email, password }) => {
-    console.log('App received', { email, password })
-    signIn({ email, password })
-      .then( decodedToken => {
-        console.log('signed in', decodedToken)
-        this.setState({ decodedToken })
+  onSignIn = data => {
+    console.log('App received', data)
+    console.log('Sign In', data.email, data.password)
+    if (data.email === '' || data.password === '') {
+      this.setState({
+        errors: {
+          signInError: 'Invalid username/password'
+        }
       })
+      return
+    }
+
+    signIn(data).then(decodedToken => {
+      if (!decodedToken.error) {
+        console.log('signed in', decodedToken)
+        this.setState({
+          decodedToken,
+          errors: {
+            signInError: ''
+          }
+        })
+        this.loadProductsList()
+      } else {
+        this.setState({
+          errors: {
+            signInError: 'Invalid username/password'
+          }
+        })
+        return
+      }
+    })
   }
 
   onSignOut = () => {
@@ -35,20 +67,19 @@ class App extends Component {
     this.setState({ decodedToken: null })
   }
 
-  onSignUp = (data) => {
-    signUpNow(data)
-      .then( decodedToken => {
-        console.log('signed up', decodedToken)
-        this.setState( prevState => {
-          return {
-            decodedToken,
-            showSignUpForm: false
-          }
-        })
+  onSignUp = data => {
+    signUpNow(data).then(decodedToken => {
+      console.log('signed up', decodedToken)
+      this.setState(prevState => {
+        return {
+          decodedToken,
+          showSignUpForm: false
+        }
       })
+    })
   }
 
-  onProductNew = (event) => {
+  onProductNew = event => {
     console.log('New product..')
     event.preventDefault()
     this.setState({
@@ -60,13 +91,13 @@ class App extends Component {
     })
   }
 
-  onProductSave = (data) => {
+  onProductSave = data => {
     console.log('Saving product..', data)
-    if(data.id) {
-      updateProduct(data).then( product => {
-        this.setState( prevState => {
+    if (data.id) {
+      updateProduct(data).then(product => {
+        this.setState(prevState => {
           const prevProducts = prevState.products
-          const updatedProducts = prevProducts.map( (item) => {
+          const updatedProducts = prevProducts.map(item => {
             // If product being edited is found
             if (item._id === product._id) {
               const copy = {
@@ -75,8 +106,7 @@ class App extends Component {
                 brandName: product.brandName
               }
               return copy
-            }
-            else {
+            } else {
               return item
             }
           })
@@ -92,10 +122,9 @@ class App extends Component {
         })
         // this.loadProductsList()
       })
-    }
-    else {
-      addProduct(data).then( product => {
-        this.setState( prevState => {
+    } else {
+      addProduct(data).then(product => {
+        this.setState(prevState => {
           const newProducts = [...prevState.products, product]
           console.log('saved products', newProducts)
           return {
@@ -112,11 +141,11 @@ class App extends Component {
     }
   }
 
-  onProductGet = (event) => {
+  onProductGet = event => {
     event.preventDefault()
     const productId = event.target.name
     console.log('Getting product...', productId)
-    getProduct(productId).then( currentProduct => {
+    getProduct(productId).then(currentProduct => {
       console.log('Found product', currentProduct)
       this.setState({
         currentProduct
@@ -124,114 +153,136 @@ class App extends Component {
     })
   }
 
-  onInputChange = (event) => {
-    const {name, value} = event.target
-    switch(name) {
+  onInputChange = event => {
+    const { name, value } = event.target
+    switch (name) {
       case 'name':
-        this.setState( prevState => {
+        this.setState(prevState => {
           const oldCurrentProduct = prevState.currentProduct
           return { currentProduct: { ...oldCurrentProduct, name: value } }
         })
         break
       case 'brandName':
-        this.setState( prevState => {
+        this.setState(prevState => {
           const oldCurrentProduct = prevState.currentProduct
           return { currentProduct: { ...oldCurrentProduct, brandName: value } }
         })
         break
+      default:
+        break
     }
   }
 
-  toggleSignUp = () => {
+  toggleSignUp = event => {
     console.log('Signing up..')
+    event.preventDefault()
     // showSignUpForm()
-    this.setState( prevState => {
+    this.setState(prevState => {
       const signedUpShown = prevState.showSignUpForm
-      return { showSignUpForm: !signedUpShown }
+      return {
+        showSignUpForm: !signedUpShown,
+        errors: {
+          signInError: ''
+        }
+      }
     })
   }
 
   loadProductsList = () => {
     listProducts()
-    .then( products => {
-      console.log('loaded products', products)
-      this.setState({
-        products
+      .then(products => {
+        console.log('loaded products', products)
+        this.setState({
+          products
+        })
       })
-    })
-    .catch( error => {
-      console.error('error loading products', error)
-    })
+      .catch(error => {
+        console.error('error loading products', error)
+      })
   }
 
   render() {
-    const { decodedToken, showSignUpForm, products, currentProduct } = this.state
+    const {
+      decodedToken,
+      showSignUpForm,
+      products,
+      currentProduct,
+      errors
+    } = this.state
 
     return (
       <div>
         <div className="jumbotron bg-primary text-light">
           <h1 className="display-3">Yarra</h1>
-          <p className="lead">Now Delivering: Shipping trillions of new products</p>
+          <p className="lead">
+            Now Delivering: Shipping trillions of new products
+          </p>
         </div>
         <div className="App container-fluid">
-          {
-            !!decodedToken ? (
-              <div>
-                <p>Email: { decodedToken.email }</p>
-                <p>Signed in at: { new Date(decodedToken.iat * 1000).toISOString() }</p>
-                <p>Expired at: { new Date(decodedToken.exp * 1000).toISOString() }</p>
-                <button className='btn btn-primary' onClick={ this.onSignOut } >Sign Out</button>
-              </div>
-            ) : (
-              !showSignUpForm && (
+          {!!decodedToken ? (
+            <div>
+              <p>Email: {decodedToken.email}</p>
+              <p>
+                Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}
+              </p>
+              <p>
+                Expired at: {new Date(decodedToken.exp * 1000).toISOString()}
+              </p>
+              <button className="btn btn-primary" onClick={this.onSignOut}>
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            !showSignUpForm && (
               <div>
                 <SignInForm
-                  onSignIn={ this.onSignIn }
+                  onSignIn={this.onSignIn}
+                  onRegister={this.toggleSignUp}
+                  errorMessage={errors.signInError}
                 />
-                <button className="mt-1 btn btn-primary" onClick={ this.toggleSignUp } >
-                  Register
-                </button>
-              </div>
-              )
-            )
-          }
-          
-          {
-            !!showSignUpForm && (
-              <div>
-                <SignUpForm onSignUp={this.onSignUp} />
-                <button className="mt-1 btn btn-primary" onClick={ this.toggleSignUp } >
-                  Back to Sign In
-                </button>
               </div>
             )
-          }
+          )}
 
-          {
-            !!decodedToken && (
-              !!products ? (
-                <ProductsList products={products} onClickGetProduct={this.onProductGet} />
-              ) :
-              (
-                <span>Loading...</span>
-              )
-            )
-          }
+          {!!showSignUpForm && (
+            <div>
+              <SignUpForm
+                onSignUp={this.onSignUp}
+                onBackToSignIn={this.toggleSignUp}
+              />
+            </div>
+          )}
 
-          {
-            !!decodedToken && (
-              <ProductForm onProductNew={this.onProductNew} onProductSave={this.onProductSave} currentProduct={currentProduct} onInputChange={this.onInputChange} />
-            )
-          }
+          {!!decodedToken &&
+            (!!products ? (
+              <ProductsList
+                products={products}
+                onClickGetProduct={this.onProductGet}
+              />
+            ) : (
+              <span>Loading...</span>
+            ))}
+
+          {!!decodedToken && (
+            <ProductForm
+              onProductNew={this.onProductNew}
+              onProductSave={this.onProductSave}
+              currentProduct={currentProduct}
+              onInputChange={this.onInputChange}
+            />
+          )}
         </div>
       </div>
-    );
+    )
   }
 
   // WHen this App first appears on screen
   componentDidMount() {
-    this.loadProductsList()
+    const {decodedToken} = this.state
+    if(decodedToken) {
+      this.loadProductsList()
+    }
   }
 }
 
-export default App;
+export default App
