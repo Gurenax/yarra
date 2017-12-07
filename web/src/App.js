@@ -55,8 +55,7 @@ class App extends Component {
         this.setState( prevState => {
           const prevProducts = prevState.products
           const updatedProducts = prevProducts.map( (item) => {
-            console.log(item._id, product._id)
-            console.log(typeof item._id, typeof product._id)
+            // If product being edited is found
             if (item._id === product._id) {
               const copy = {
                 ...item,
