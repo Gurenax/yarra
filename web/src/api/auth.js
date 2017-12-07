@@ -10,3 +10,7 @@ export const signIn = ({ email, password }) => {
       return getDecodedToken()
     })
 }
+
+export const signOutNow = () => {
+  setToken(null)
+}
