@@ -3,6 +3,7 @@ import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
 import ProductForm from './components/ProductForm'
+import Wishlist from './components/Wishlist'
 import { signIn, signOutNow, signUpNow } from './api/auth'
 import {
   listProducts,
@@ -11,6 +12,11 @@ import {
   updateProduct,
   deleteProduct
 } from './api/product'
+import {
+  listWishlistProducts,
+  addProductToWishlist,
+  deleteProductFromWishlist
+} from './api/wishlist'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css'
@@ -20,6 +26,7 @@ class App extends Component {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
     showSignUpForm: false,
     products: null,
+    wishlist: null,
     currentProduct: {
       id: '',
       brandName: '',
@@ -255,11 +262,39 @@ class App extends Component {
     })
   }
 
+  onAddToWishlist = event => {
+    event.preventDefault()
+    const productID = event.target.name
+    console.log('Adding to wishlist', productID)
+    addProductToWishlist(productID).then(newWishlist => {
+      console.log('Product added to wishlist', newWishlist)
+      this.setState(prevState => {
+        const wishlist = Object.assign({}, newWishlist)
+        return {
+          wishlist
+        }
+      })
+    })
+  }
+
+  onRemoveFromWishlist = event=> {
+    event.preventDefault()
+    const productID = event.target.name
+    console.log('Deleting form wishlist', productID)
+    deleteProductFromWishlist(productID).then(newWishlist => {
+      console.log('Product deleted from wishlist', newWishlist)
+      this.setState({
+        wishlist: newWishlist
+      })
+    })
+  }
+
   render() {
     const {
       decodedToken,
       showSignUpForm,
       products,
+      wishlist,
       currentProduct,
       errors
     } = this.state
@@ -313,6 +348,7 @@ class App extends Component {
                 products={products}
                 onClickGetProduct={this.onProductGet}
                 onClickDeleteProduct={this.onProductDelete}
+                onClickAddToWishlist={this.onAddToWishlist} 
               />
             ) : (
               <span>Loading...</span>
@@ -327,9 +363,27 @@ class App extends Component {
               errorMessage={errors.productSaveError}
             />
           )}
+
+          {!!decodedToken && !!wishlist &&
+            ( <Wishlist products={wishlist.products} onClickRemoveFromWishlist={this.onRemoveFromWishlist} />
+          )}
         </div>
       </div>
     )
+  }
+
+  loadWishlist = () => {
+    console.log('Loading wishlist...')
+    listWishlistProducts()
+      .then(wishlist => {
+        console.log('loaded wishlist', wishlist)
+        this.setState({
+          wishlist: wishlist
+        })
+      })
+      .catch(error => {
+        console.error('error loading wishlist', error)
+      })
   }
 
   // WHen this App first appears on screen
@@ -337,6 +391,7 @@ class App extends Component {
     const { decodedToken } = this.state
     if (decodedToken) {
       this.loadProductsList()
+      this.loadWishlist()
     }
   }
 

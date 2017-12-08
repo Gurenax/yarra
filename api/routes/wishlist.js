@@ -106,7 +106,8 @@ router.delete('/wishlist/products/:productID', requireJWT, (req, res) => {
     // Options when updating
     // upsert: updates if exists, otherwise insert (creates) it
     // new: false gives us the wishlist before it was deleted
-    { upsert: true, new: false, runValidators: true })
+    // new: true gives us the updated wishlist
+    { upsert: true, new: true, runValidators: true })
     // Append product details to product id
     .populate('products')
     .then(wishlist => {
