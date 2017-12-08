@@ -8,6 +8,8 @@ const router = express.Router()
 router.get('/wishlist', requireJWT, (req, res) => {
   Wishlist.findOne({ user: req.user })
   // Once it has loaded these documents
+  // Append product details to product id
+  .populate('products')
   .then(wishlist => {
     // Send them back as the response
     if(wishlist) {
@@ -57,8 +59,10 @@ router.post('/wishlist/products/:productID', requireJWT, (req, res) => {
     { $addToSet: { products: productID } }, // products need to be plural
     // Options when updating
     // upsert: updates if exists, otherwise insert (creates) it
-    // new: gives us the updated wishlist
+    // new: true gives us the updated wishlist
     { upsert: true, new: true, runValidators: true })
+    // Append product details to product id
+    .populate('products')
     .then(wishlist => {
       res.status(201).json({ products: wishlist.products })
     })
@@ -101,10 +105,12 @@ router.delete('/wishlist/products/:productID', requireJWT, (req, res) => {
     { $pull: { products: productID } }, // products need to be plural
     // Options when updating
     // upsert: updates if exists, otherwise insert (creates) it
-    // new: gives us the updated wishlist
-    { upsert: true, new: true, runValidators: true })
+    // new: false gives us the wishlist before it was deleted
+    { upsert: true, new: false, runValidators: true })
+    // Append product details to product id
+    .populate('products')
     .then(wishlist => {
-      res.status(201).json({ products: wishlist.products })
+      res.status(200).json({ products: wishlist.products })
     })
     .catch(error => {
       res.status(400).json({ error })
