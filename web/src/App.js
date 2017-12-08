@@ -52,7 +52,7 @@ class App extends Component {
             signInError: ''
           }
         })
-        this.loadProductsList()
+        // this.loadProductsList() // use componentDidUpdate() instead to reload
       } else {
         this.setState({
           errors: {
@@ -108,9 +108,10 @@ class App extends Component {
     console.log('Saving product..', data)
     if (data.id) {
       updateProduct(data).then(product => {
+        console.log('Product updated', product)
         this.setState(prevState => {
           const prevProducts = prevState.products
-          const updatedProducts = prevProducts.map(item => {
+          const products = prevProducts.map(item => {
             // If product being edited is found
             if (item._id === product._id) {
               const copy = {
@@ -123,9 +124,8 @@ class App extends Component {
               return item
             }
           })
-          console.log('saved products', updatedProducts)
           return {
-            products: updatedProducts,
+            products,
             currentProduct: {
               id: '',
               brandName: '',
@@ -140,11 +140,11 @@ class App extends Component {
       })
     } else {
       addProduct(data).then(product => {
+        console.log('Product added', product)
         this.setState(prevState => {
-          const newProducts = [...prevState.products, product]
-          console.log('saved products', newProducts)
+          const products = prevState.products.concat(product)
           return {
-            products: newProducts,
+            products,
             currentProduct: {
               id: '',
               brandName: '',
@@ -158,6 +158,28 @@ class App extends Component {
         // this.loadProductsList()
       })
     }
+  }
+
+  // Reloads product list with API data
+  loadProductsList = () => {
+    listProducts()
+      .then(products => {
+        console.log('loaded products', products)
+        this.setState({
+          products,
+          currentProduct: {
+            id: '',
+            brandName: '',
+            name: ''
+          },
+          errors: {
+            productSaveError: null
+          }
+        })
+      })
+      .catch(error => {
+        console.error('error loading products', error)
+      })
   }
 
   onProductGet = event => {
@@ -181,10 +203,9 @@ class App extends Component {
       this.setState(prevState => {
         const prevProducts = prevState.products
         // Filter only products which are not deleted
-        const updatedProducts = prevProducts.filter(item => item._id !== productId)
-        console.log('saved products', updatedProducts)
+        const products = prevProducts.filter(item => item._id !== productId)
         return {
-          products: updatedProducts,
+          products,
           currentProduct: {
             id: '',
             brandName: '',
@@ -195,6 +216,7 @@ class App extends Component {
           }
         }
       })
+      // this.loadProductsList()
     })
   }
 
@@ -231,19 +253,6 @@ class App extends Component {
         }
       }
     })
-  }
-
-  loadProductsList = () => {
-    listProducts()
-      .then(products => {
-        console.log('loaded products', products)
-        this.setState({
-          products
-        })
-      })
-      .catch(error => {
-        console.error('error loading products', error)
-      })
   }
 
   render() {
@@ -327,6 +336,14 @@ class App extends Component {
   componentDidMount() {
     const { decodedToken } = this.state
     if (decodedToken) {
+      this.loadProductsList()
+    }
+  }
+
+  // When the state changes
+  componentDidUpdate(prevProps, prevState) {
+    console.log('Component Updated')
+    if(this.state.decodedToken !== prevState.decodedToken) {
       this.loadProductsList()
     }
   }
