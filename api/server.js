@@ -13,6 +13,7 @@ server.use(authMiddleware.initialize) // Kick passport off
 // Routes
 server.use('/', [
   require('./routes/product'),
+  require('./routes/category'),
   require('./routes/auth'),
   require('./routes/wishlist'),
 ])

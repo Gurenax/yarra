@@ -8,6 +8,7 @@ const router = express.Router()
 router.get('/products', authMiddleware.requireJWT, (req, res) => {
   Product.find()
   // Once it has loaded these documents
+  .populate('categories')
   .then(products => {
     // Send them back as the response
     res.json(products)

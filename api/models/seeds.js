@@ -1,34 +1,57 @@
 const Product = require('./Product')
+const Category = require('./Category')
+
+// Category.create([
+//   {
+//     name: 'Lightside',
+//     products: []
+//   },
+//   {
+//     name: 'Darkside',
+//     products: []
+//   }
+// ])
+// .then(categories => {
+//   console.log('Created categories', categories)
+// })
+// .catch(error => {
+//   console.error('Error', error)
+// })
 
 Product.create([
   {
     brandName: 'Saber Forge',
-    name: 'Acolyte'
+    name: 'Acolyte',
+    categories: ['5a2a2a0bfebf7bb6407c2392']
   },
   {
     brandName: 'Saber Forge',
-    name: 'Bastion'
+    name: 'Bastion',
+    categories: ['5a2a2a0bfebf7bb6407c2392']
   },
   {
     brandName: 'Saber Forge',
-    name: 'Forsaken'
+    name: 'Forsaken',
+    categories: ['5a2a2a0bfebf7bb6407c2392']
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Tempest Elite'
+    name: 'Tempest Elite',
+    categories: []
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Ardent'
+    name: 'Ardent',
+    categories: []
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Brawler'
+    name: 'Brawler',
+    categories: []
   }
 ])
   .then(products => {
     console.log('Created products', products)
-    process.exit()
   })
   .catch(error => {
     console.error('Error', error)
