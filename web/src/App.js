@@ -19,7 +19,13 @@ import {
   addProductToWishlist,
   deleteProductFromWishlist
 } from './api/wishlist'
-import { listCategories, addCategory, getCategory } from './api/category'
+import {
+  listCategories,
+  addCategory,
+  getCategory,
+  updateCategory,
+  addProductsToCategory
+} from './api/category'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css'
@@ -119,11 +125,23 @@ class App extends Component {
       return
     }
     console.log('Saving product..', data)
-    data = {...data, categories: this.state.currentProduct.categories}
+    data = { ...data, categories: this.state.currentProduct.categories }
     if (data.id) {
       console.log('Updating product..', data)
       updateProduct(data).then(product => {
         console.log('Product updated', product)
+        product.categories.map(category => {
+          console.log('Updating category', category)
+          addProductsToCategory(category, product._id)
+            .then(updatedCategory => {
+              console.log('Updated category', updatedCategory)
+              this.loadCategoriesList()
+            })
+            .catch(error => {
+              console.error(error)
+            })
+        })
+
         this.setState(prevState => {
           const prevProducts = prevState.products
           const products = prevProducts.map(item => {
@@ -159,6 +177,18 @@ class App extends Component {
       console.log('Adding new product..', data)
       addProduct(data).then(product => {
         console.log('Product added', product)
+        product.categories.map(category => {
+          console.log('Updating category', category)
+          addProductsToCategory(category, product._id)
+            .then(updatedCategory => {
+              console.log('Updated category', updatedCategory)
+              this.loadCategoriesList()
+            })
+            .catch(error => {
+              console.error(error)
+            })
+        })
+
         this.setState(prevState => {
           const products = prevState.products.concat(product)
           return {
@@ -182,7 +212,7 @@ class App extends Component {
   // Reload category list
   loadCategoriesList = () => {
     listCategories()
-      .then( categories => {
+      .then(categories => {
         console.log('loaded categories', categories)
         this.setState({
           categories
@@ -318,7 +348,7 @@ class App extends Component {
   }
 
   onCategorySave = data => {
-    addCategory(data).then( category => {
+    addCategory(data).then(category => {
       console.log('Category added', category)
       this.setState(prevState => {
         const categories = prevState.categories.concat(category)
@@ -333,24 +363,21 @@ class App extends Component {
     const categoryId = event.target.name
     const newValue = event.target.value
     console.log(categoryId, newValue)
-    getCategory(categoryId)
-      .then(category => {
-        this.setState(prevState => {
-          const currentProduct = prevState.currentProduct
-          const categories = currentProduct.categories
-          const categoryIDs = categories.map( val => val._id )
-          if (categoryIDs.indexOf(categoryId) > -1) {
-            categories.pop(category)
-          }
-          else {
-            categories.push(category)
-          }
-          return {
-            currentProduct
-          }
-        })
+    getCategory(categoryId).then(category => {
+      this.setState(prevState => {
+        const currentProduct = prevState.currentProduct
+        const categories = currentProduct.categories
+        const categoryIDs = categories.map(val => val._id)
+        if (categoryIDs.indexOf(categoryId) > -1) {
+          categories.pop(category)
+        } else {
+          categories.push(category)
+        }
+        return {
+          currentProduct
+        }
       })
-    
+    })
   }
 
   render() {
@@ -413,7 +440,7 @@ class App extends Component {
                 products={products}
                 onClickGetProduct={this.onProductGet}
                 onClickDeleteProduct={this.onProductDelete}
-                onClickAddToWishlist={this.onAddToWishlist} 
+                onClickAddToWishlist={this.onAddToWishlist}
               />
             ) : (
               <span>Loading...</span>
@@ -431,13 +458,19 @@ class App extends Component {
             />
           )}
 
-          {!!decodedToken && !!wishlist &&
-            ( <Wishlist products={wishlist.products} onClickRemoveFromWishlist={this.onRemoveFromWishlist} />
+          {!!decodedToken &&
+            !!wishlist && (
+              <Wishlist
+                products={wishlist.products}
+                onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+              />
+            )}
+
+          {!!decodedToken &&
+            !!categories && <CategoryList categories={categories} />}
+          {!!decodedToken && (
+            <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
           )}
-
-          {!!decodedToken && !!categories && ( <CategoryList categories={categories} />) }
-          {!!decodedToken && ( <CategoryForm onSubmitCreateCategory={this.onCategorySave} /> )}
-
         </div>
       </div>
     )
@@ -470,7 +503,7 @@ class App extends Component {
   // When the state changes
   componentDidUpdate(prevProps, prevState) {
     console.log('Component Updated')
-    if(this.state.decodedToken !== prevState.decodedToken) {
+    if (this.state.decodedToken !== prevState.decodedToken) {
       this.loadProductsList()
     }
   }

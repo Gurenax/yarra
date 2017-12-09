@@ -17,7 +17,15 @@ export const addCategory = (category) => {
 }
 
 export const updateCategory = (category) => {
-  return api.patch(`/categories/${category.id}`, { name: category.name})
+  return api.patch(`/categories/${category._id}`, { name: category.name })
+    .then( res => {
+      const newCategory = res.data
+      return newCategory
+    })
+}
+
+export const addProductsToCategory = (category, productID) => {
+  return api.put(`/categories/${category._id}/new_product/${productID}`)
     .then( res => {
       const newCategory = res.data
       return newCategory

@@ -52,6 +52,31 @@ router.post('/categories', requireJWT, (req, res) => {
     })
 })
 
+// PUT - Add new product to category
+router.put('/categories/:id/new_product/:productID', requireJWT, (req, res) => {
+  console.log(req.params)
+  const { id, productID } = req.params
+  console.log('put product to category', id, productID)
+  Category.findOneAndUpdate(
+    { _id: id },
+    // The $addToSet operator adds a value to an array unless
+    // the value is already present, in which case $addToSet
+    // does nothing to that array.
+    { $addToSet: { products: productID } }, // products need to be plural
+    // Options when updating
+    // upsert: updates if exists, otherwise insert (creates) it
+    // new: true gives us the updated wishlist
+    { upsert: true, new: true, runValidators: true })
+    // Append product details to product id
+    .populate('products')
+    .then(category => {
+      res.status(201).json({ products: category.products })
+    })
+    .catch(error => {
+      res.status(400).json({ error })
+    })
+})
+
 // PATCH - Update a category document
 router.patch('/categories/:id', requireJWT, (req, res) => {
   const id = req.params.id

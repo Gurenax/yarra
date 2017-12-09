@@ -1,53 +1,45 @@
 const Product = require('./Product')
 const Category = require('./Category')
 
-// Category.create([
-//   {
-//     name: 'Lightside',
-//     products: []
-//   },
-//   {
-//     name: 'Darkside',
-//     products: []
-//   }
-// ])
-// .then(categories => {
-//   console.log('Created categories', categories)
-// })
-// .catch(error => {
-//   console.error('Error', error)
-// })
+Category.create([
+  {
+    name: 'Lightside'
+  },
+  {
+    name: 'Darkside'
+  }
+])
+.then(categories => {
+  console.log('Created categories', categories)
+})
+.catch(error => {
+  console.error('Error', error)
+})
 
 Product.create([
   {
     brandName: 'Saber Forge',
-    name: 'Acolyte',
-    categories: ['5a2a2a0bfebf7bb6407c2392']
+    name: 'Acolyte'
   },
   {
     brandName: 'Saber Forge',
-    name: 'Bastion',
-    categories: ['5a2a2a0bfebf7bb6407c2392']
+    name: 'Bastion'
   },
   {
     brandName: 'Saber Forge',
-    name: 'Forsaken',
-    categories: ['5a2a2a0bfebf7bb6407c2392']
+    name: 'Forsaken'
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Tempest Elite',
-    categories: []
+    name: 'Tempest Elite'
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Ardent',
-    categories: []
+    name: 'Ardent'
   },
   {
     brandName: 'Vader\'s Vault',
-    name: 'Brawler',
-    categories: []
+    name: 'Brawler'
   }
 ])
   .then(products => {

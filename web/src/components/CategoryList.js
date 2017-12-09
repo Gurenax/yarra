@@ -11,6 +11,7 @@ const CategoryList = ({
           <tr>
             <th scope="col">#</th>
             <th scope="col">Name</th>
+            <th scope="col">Products</th>
             <th scope="col" />
             <th scope="col" />
           </tr>
@@ -20,6 +21,7 @@ const CategoryList = ({
             <tr key={category._id}>
               <th scope="row">{index + 1}</th>
               <td>{category.name}</td>
+              <td>{category.products.map(product=>product.name).join(',')}</td>
               <td>
                 <button
                   className="btn btn-primary"
