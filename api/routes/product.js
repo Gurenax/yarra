@@ -24,6 +24,7 @@ router.get('/products/:id', authMiddleware.requireJWT, (req, res) => {
   // Ask the model for the document with this id
   Product.findById(id)
     // Once it has loaded this document
+    .populate('categories')
     .then(product => {
       // If an product was found
       if(product) {
