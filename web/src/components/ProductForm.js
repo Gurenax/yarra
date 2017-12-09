@@ -6,7 +6,8 @@ const ProductForm = ({
   onProductNew,
   onProductSave,
   onInputChange,
-  errorMessage
+  onToggleCheckbox,
+  errorMessage,
 }) => {
   return (
     <div className="mt-3">
@@ -71,17 +72,17 @@ const ProductForm = ({
             onChange={onInputChange}
           />
         </label>
-        <label className="mb-2">
+        <div className="mb-2">
           {'Categories: '}
           {!!categories && categories.map( (category, index) => (
             <div className="form-check">
               <label className="form-check-label">
-                <input className="form-check-input" type="checkbox" value={category._id} checked={ !!currentProduct.categories && currentProduct.categories.map(val=>val._id).indexOf(category._id)!==-1 ? true : false } />
+                <input className="form-check-input" type="checkbox" name={category._id} checked={ !!currentProduct.categories && currentProduct.categories.map(val=>val._id).indexOf(category._id)!==-1 ? true : false } onChange={onToggleCheckbox}/>
                 {category.name}
               </label>
             </div>
           ))}
-        </label>
+        </div>
 
         <button onClick={onProductNew} className="btn btn-primary mr-1">
           New Product

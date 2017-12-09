@@ -46,7 +46,14 @@ router.post('/products', authMiddleware.requireJWT, (req, res) => {
   const attributes = req.body
   Product.create(attributes)
     .then(product => {
-      res.status(201).json(product)
+      Product.findOne(product)
+      .populate('categories')
+      .then(product => {
+        res.status(201).json(product)
+      })
+      .catch(error => {
+        res.status(400).json({ error: error })
+      })
     })
     .catch(error => {
       res.status(400).json({ error: error })
@@ -58,6 +65,7 @@ router.patch('/products/:id', authMiddleware.requireJWT, (req, res) => {
   const id = req.params.id
   const attributes = req.body
   Product.findByIdAndUpdate(id, attributes, { new: true, runValidators: true })
+    .populate('categories')
     .then(product => {
       // If an product was found and updated
       if(product) {

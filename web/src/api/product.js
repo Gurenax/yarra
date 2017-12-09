@@ -17,7 +17,7 @@ export const addProduct = (product) => {
 }
 
 export const updateProduct = (product) => {
-  return api.patch(`/products/${product.id}`, { brandName: product.brandName, name: product.name})
+  return api.patch(`/products/${product.id}`, { brandName: product.brandName, name: product.name, categories: product.categories})
     .then( res => {
       const newProduct = res.data
       return newProduct

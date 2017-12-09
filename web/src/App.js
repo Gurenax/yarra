@@ -19,7 +19,7 @@ import {
   addProductToWishlist,
   deleteProductFromWishlist
 } from './api/wishlist'
-import { listCategories, addCategory } from './api/category'
+import { listCategories, addCategory, getCategory } from './api/category'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css'
@@ -119,7 +119,9 @@ class App extends Component {
       return
     }
     console.log('Saving product..', data)
+    data = {...data, categories: this.state.currentProduct.categories}
     if (data.id) {
+      console.log('Updating product..', data)
       updateProduct(data).then(product => {
         console.log('Product updated', product)
         this.setState(prevState => {
@@ -130,7 +132,8 @@ class App extends Component {
               const copy = {
                 ...item,
                 name: product.name,
-                brandName: product.brandName
+                brandName: product.brandName,
+                categories: product.categories
               }
               return copy
             } else {
@@ -153,6 +156,7 @@ class App extends Component {
         // this.loadProductsList()
       })
     } else {
+      console.log('Adding new product..', data)
       addProduct(data).then(product => {
         console.log('Product added', product)
         this.setState(prevState => {
@@ -199,7 +203,8 @@ class App extends Component {
           currentProduct: {
             id: '',
             brandName: '',
-            name: ''
+            name: '',
+            categories: []
           },
           errors: {
             productSaveError: null
@@ -324,6 +329,30 @@ class App extends Component {
     })
   }
 
+  onToggleCheckbox = event => {
+    const categoryId = event.target.name
+    const newValue = event.target.value
+    console.log(categoryId, newValue)
+    getCategory(categoryId)
+      .then(category => {
+        this.setState(prevState => {
+          const currentProduct = prevState.currentProduct
+          const categories = currentProduct.categories
+          const categoryIDs = categories.map( val => val._id )
+          if (categoryIDs.indexOf(categoryId) > -1) {
+            categories.pop(category)
+          }
+          else {
+            categories.push(category)
+          }
+          return {
+            currentProduct
+          }
+        })
+      })
+    
+  }
+
   render() {
     const {
       decodedToken,
@@ -397,6 +426,7 @@ class App extends Component {
               currentProduct={currentProduct}
               categories={categories}
               onInputChange={this.onInputChange}
+              onToggleCheckbox={this.onToggleCheckbox}
               errorMessage={errors.productSaveError}
             />
           )}
