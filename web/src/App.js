@@ -34,7 +34,8 @@ class App extends Component {
     currentProduct: {
       id: '',
       brandName: '',
-      name: ''
+      name: '',
+      categories: []
     },
     errors: {
       signInError: null,
@@ -99,7 +100,8 @@ class App extends Component {
       currentProduct: {
         id: '',
         brandName: '',
-        name: ''
+        name: '',
+        categories: []
       },
       errors: {
         productSaveError: null
@@ -140,7 +142,8 @@ class App extends Component {
             currentProduct: {
               id: '',
               brandName: '',
-              name: ''
+              name: '',
+              categories: []
             },
             errors: {
               productSaveError: null
@@ -159,7 +162,8 @@ class App extends Component {
             currentProduct: {
               id: '',
               brandName: '',
-              name: ''
+              name: '',
+              categories: []
             },
             errors: {
               productSaveError: null
@@ -234,7 +238,8 @@ class App extends Component {
           currentProduct: {
             id: '',
             brandName: '',
-            name: ''
+            name: '',
+            categories: []
           },
           errors: {
             productSaveError: null
@@ -390,6 +395,7 @@ class App extends Component {
               onProductNew={this.onProductNew}
               onProductSave={this.onProductSave}
               currentProduct={currentProduct}
+              categories={categories}
               onInputChange={this.onInputChange}
               errorMessage={errors.productSaveError}
             />

@@ -2,6 +2,7 @@ import React from 'react'
 
 const ProductForm = ({
   currentProduct,
+  categories,
   onProductNew,
   onProductSave,
   onInputChange,
@@ -56,6 +57,32 @@ const ProductForm = ({
             onChange={onInputChange}
           />
         </label>
+
+        <label className="mb-2">
+          {'Categories: '}
+          <input
+            type="text"
+            name="categories"
+            value={
+              (!!currentProduct.categories && currentProduct.categories.reduce( (categories, category, index) => {
+                categories += index<currentProduct.categories.length-1 ? category.name + ',' : category.name
+                return categories
+              }, '' )) || ''}
+            onChange={onInputChange}
+          />
+        </label>
+        <label className="mb-2">
+          {'Categories: '}
+          {!!categories && categories.map( (category, index) => (
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input" type="checkbox" value={category._id} checked={ !!currentProduct.categories && currentProduct.categories.map(val=>val._id).indexOf(category._id)!==-1 ? true : false } />
+                {category.name}
+              </label>
+            </div>
+          ))}
+        </label>
+
         <button onClick={onProductNew} className="btn btn-primary mr-1">
           New Product
         </button>

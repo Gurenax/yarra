@@ -19,9 +19,13 @@ label {
   display: block;
 }
 
-input {
+input[type="text"], input[type="email"], input[type="password"] {
   display: block;
   width: 100%;
+}
+
+label.form-check-label {
+  display: inline;
 }
 
 /* .mb-1 { margin-bottom: 0.25rem }
