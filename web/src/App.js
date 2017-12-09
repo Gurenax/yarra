@@ -3,6 +3,8 @@ import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
 import ProductForm from './components/ProductForm'
+import CategoryForm from './components/CategoryForm'
+import CategoryList from './components/CategoryList'
 import Wishlist from './components/Wishlist'
 import { signIn, signOutNow, signUpNow } from './api/auth'
 import {
@@ -17,6 +19,7 @@ import {
   addProductToWishlist,
   deleteProductFromWishlist
 } from './api/wishlist'
+import { listCategories, addCategory } from './api/category'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css'
@@ -26,6 +29,7 @@ class App extends Component {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
     showSignUpForm: false,
     products: null,
+    categories: null,
     wishlist: null,
     currentProduct: {
       id: '',
@@ -167,6 +171,20 @@ class App extends Component {
     }
   }
 
+  // Reload category list
+  loadCategoriesList = () => {
+    listCategories()
+      .then( categories => {
+        console.log('loaded categories', categories)
+        this.setState({
+          categories
+        })
+      })
+      .catch(error => {
+        console.error('error loading categories', error)
+      })
+  }
+
   // Reloads product list with API data
   loadProductsList = () => {
     listProducts()
@@ -277,7 +295,7 @@ class App extends Component {
     })
   }
 
-  onRemoveFromWishlist = event=> {
+  onRemoveFromWishlist = event => {
     event.preventDefault()
     const productID = event.target.name
     console.log('Deleting form wishlist', productID)
@@ -289,11 +307,24 @@ class App extends Component {
     })
   }
 
+  onCategorySave = data => {
+    addCategory(data).then( category => {
+      console.log('Category added', category)
+      this.setState(prevState => {
+        const categories = prevState.categories.concat(category)
+        return {
+          categories
+        }
+      })
+    })
+  }
+
   render() {
     const {
       decodedToken,
       showSignUpForm,
       products,
+      categories,
       wishlist,
       currentProduct,
       errors
@@ -367,6 +398,10 @@ class App extends Component {
           {!!decodedToken && !!wishlist &&
             ( <Wishlist products={wishlist.products} onClickRemoveFromWishlist={this.onRemoveFromWishlist} />
           )}
+
+          {!!decodedToken && !!categories && ( <CategoryList categories={categories} />) }
+          {!!decodedToken && ( <CategoryForm onSubmitCreateCategory={this.onCategorySave} /> )}
+
         </div>
       </div>
     )
@@ -391,6 +426,7 @@ class App extends Component {
     const { decodedToken } = this.state
     if (decodedToken) {
       this.loadProductsList()
+      this.loadCategoriesList()
       this.loadWishlist()
     }
   }

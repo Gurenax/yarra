@@ -14,6 +14,7 @@ const ProductsList = ({
           <th scope="col">#</th>
           <th scope="col">Brand Name</th>
           <th scope="col">Name</th>
+          <th scope="col">Category</th>
           <th scope="col" />
           <th scope="col" />
           <th scope="col" />
@@ -25,6 +26,13 @@ const ProductsList = ({
             <th scope="row">{index + 1}</th>
             <td>{product.brandName}</td>
             <td>{product.name}</td>
+            <td>
+              {
+                product.categories.map( category => (
+                  <span>{category.name}{index<category.length-1 && ','}</span>
+                ))
+              }
+            </td>
             <td>
               <button
                 className="btn btn-primary"
