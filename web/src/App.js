@@ -297,6 +297,9 @@ class App extends Component {
       })
       // this.loadProductsList()
     })
+    .then( () => {
+      this.loadCategoriesList()
+    })
   }
 
   onInputChange = event => {
@@ -385,6 +388,9 @@ class App extends Component {
           categories
         }
       })
+    })
+    .then( () => {
+      this.loadProductsList()
     })
   }
 
