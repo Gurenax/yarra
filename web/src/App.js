@@ -24,6 +24,7 @@ import {
   addCategory,
   getCategory,
   updateCategory,
+  deleteCategory,
   addProductToCategory,
   removeProductFromCategory
 } from './api/category'
@@ -372,6 +373,21 @@ class App extends Component {
     })
   }
 
+  onCategoryDelete = event => {
+    const categoryID = event.target.name
+    deleteCategory(categoryID).then(category => {
+    console.log('Category deleted', category)
+      this.setState(prevState => {
+        const categories = prevState.categories.filter( item => {
+          return item._id !== category._id
+        })
+        return {
+          categories
+        }
+      })
+    })
+  }
+
   onToggleCheckbox = event => {
     const categoryId = event.target.name
     getCategory(categoryId).then(category => {
@@ -486,7 +502,7 @@ class App extends Component {
             )}
 
           {!!decodedToken &&
-            !!categories && <CategoryList categories={categories} />}
+            !!categories && <CategoryList categories={categories} onClickDeleteCategory={this.onCategoryDelete} />}
           {!!decodedToken && (
             <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
           )}

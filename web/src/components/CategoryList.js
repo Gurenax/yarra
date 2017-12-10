@@ -1,7 +1,8 @@
 import React from 'react'
 
 const CategoryList = ({
-  categories
+  categories,
+  onClickDeleteCategory
 }) => {
   return (
     <div className="mt-3">
@@ -34,6 +35,7 @@ const CategoryList = ({
                 <button
                   className="btn btn-primary"
                   name={category._id}
+                  onClick={onClickDeleteCategory}
                 >
                   Delete
                 </button>
