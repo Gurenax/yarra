@@ -23,7 +23,7 @@ import {
   listCategories,
   addCategory,
   getCategory,
-  updateCategory,
+  // updateCategory,
   deleteCategory,
   addProductToCategory,
   removeProductFromCategory
@@ -147,6 +147,7 @@ class App extends Component {
             .catch(error => {
               console.error(error)
             })
+          return null
         })
 
         this.setState(prevState => {
@@ -197,6 +198,7 @@ class App extends Component {
             .catch(error => {
               console.error(error)
             })
+          return null
         })
 
         this.setState(prevState => {
