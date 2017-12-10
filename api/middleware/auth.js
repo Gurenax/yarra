@@ -2,12 +2,13 @@ const passport = require('passport')
 const JWT = require('jsonwebtoken')
 const PassportJwt = require('passport-jwt')
 const User = require('../models/User')
+require('dotenv').config()
 
 // These should be in .env
 // secret (generated using `openssl rand -base64 48` from console)
-const jwtSecret = 'Z4rxmCFgxGUmworqbzQP01EJAOEIPAVoFcs3MIQpiio+q1G4+PFYQi095IRdsTE0'
-const jwtAlgorithm = 'HS256'
-const jwtExpiresIn = '7 days'
+const jwtSecret = process.env.JWT_SECRET
+const jwtAlgorithm = process.env.JWT_ALGORITHM
+const jwtExpiresIn = process.env.JWT_EXPIRATION
 
 passport.use(User.createStrategy())
 
