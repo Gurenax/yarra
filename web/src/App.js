@@ -31,6 +31,12 @@ import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
 import './App.css'
 
+const removeItemIDFromArray = (id, array) => {
+  const index = array.map(val=>val._id).indexOf(id)
+  console.log('removing index', index)
+  return array.splice(index, 1)
+}
+
 class App extends Component {
   state = {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
@@ -160,18 +166,20 @@ class App extends Component {
           })
           return {
             products,
-            currentProduct: {
-              id: '',
-              brandName: '',
-              name: '',
-              categories: []
-            },
+            // currentProduct: {
+            //   id: '',
+            //   brandName: '',
+            //   name: '',
+            //   categories: []
+            // },
             errors: {
               productSaveError: null
             }
           }
         })
         // this.loadProductsList()
+      })
+      .then( () => {
         // Reload categories list
         this.loadCategoriesList()
       })
@@ -206,6 +214,8 @@ class App extends Component {
           }
         })
         // this.loadProductsList()
+      })
+      .then( () => {
         // Reload categories list
         this.loadCategoriesList()
       })
@@ -252,9 +262,9 @@ class App extends Component {
   onProductGet = event => {
     event.preventDefault()
     const productId = event.target.name
-    console.log('Getting product...', productId)
+    // console.log('Getting product...', productId)
     getProduct(productId).then(currentProduct => {
-      console.log('Found product', currentProduct)
+      // console.log('Found product', currentProduct)
       this.setState({
         currentProduct
       })
@@ -367,13 +377,17 @@ class App extends Component {
     getCategory(categoryId).then(category => {
       this.setState(prevState => {
         const currentProduct = prevState.currentProduct
-        const categories = currentProduct.categories
+        let categories = currentProduct.categories
         const categoryIDs = categories.map(val => val._id)
         if (categoryIDs.indexOf(categoryId) > -1) {
-          categories.pop(category)
+          
+          // Update UI
+          categories = removeItemIDFromArray(category._id, categories)
+
+          // Update API
           removeProductFromCategory(category, currentProduct._id)
-          .then( (newCategory) => {
-            console.log('Removed product from category', newCategory)
+          .then( (result) => {
+            console.log('Removed product from category', result)
           })
         } else {
           categories.push(category)
