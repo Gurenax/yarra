@@ -75,7 +75,7 @@ const ProductForm = ({
         <div className="mb-2">
           {'Categories: '}
           {!!categories && categories.map( (category, index) => (
-            <div className="form-check">
+            <div className="form-check mt-2">
               <label className="form-check-label">
                 <input className="form-check-input" type="checkbox" name={category._id} checked={ !!currentProduct.categories && currentProduct.categories.map(val=>val._id).indexOf(category._id)!==-1 ? true : false } onChange={onToggleCheckbox}/>
                 {category.name}
