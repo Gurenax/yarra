@@ -23,7 +23,7 @@ import {
   listCategories,
   addCategory,
   getCategory,
-  // updateCategory,
+  updateCategory,
   deleteCategory,
   addProductToCategory,
   removeProductFromCategory
@@ -423,6 +423,32 @@ class App extends Component {
     })
   }
 
+  onCategoryNameChanged = (event) => {
+    const index = event.target.name
+    const value = event.target.value
+
+    this.setState( prevState => {
+      const categories = prevState.categories
+      categories[index].name = value
+      return {
+        categories
+      }
+    })
+  }
+
+  toggleUpdateButton = (event) => {
+    const index = event.target.name
+    console.log(index)
+  }
+
+  onCategoryUpdate = (event) => {
+    const index = event.target.name
+    const category = {...this.state.categories[index]}
+    updateCategory(category).then( result => {
+      console.log('Updated category', result)
+    })
+  }
+
   render() {
     const {
       decodedToken,
@@ -510,7 +536,7 @@ class App extends Component {
             )}
 
           {!!decodedToken &&
-            !!categories && <CategoryList categories={categories} onClickDeleteCategory={this.onCategoryDelete} />}
+            !!categories && <CategoryList categories={categories} onChangeCategoryName={this.onCategoryNameChanged} onClickUpdateCategory={this.onCategoryUpdate} onClickDeleteCategory={this.onCategoryDelete} />}
           {!!decodedToken && (
             <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
           )}

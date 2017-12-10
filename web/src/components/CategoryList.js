@@ -2,6 +2,8 @@ import React from 'react'
 
 const CategoryList = ({
   categories,
+  onChangeCategoryName,
+  onClickUpdateCategory,
   onClickDeleteCategory
 }) => {
   return (
@@ -21,14 +23,15 @@ const CategoryList = ({
           {categories.map((category, index) => (
             <tr key={category._id}>
               <th scope="row">{index + 1}</th>
-              <td>{category.name}</td>
+              <td><input type="text" value={category.name} name={index} onChange={onChangeCategoryName} /></td>
               <td>{category.products.map(product=>product.name).join(',')}</td>
               <td>
                 <button
                   className="btn btn-primary"
-                  name={category._id}
+                  name={index}
+                  onClick={onClickUpdateCategory}
                 >
-                  Edit
+                  Update
                 </button>
               </td>
               <td>
