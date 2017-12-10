@@ -28,8 +28,8 @@ const ProductsList = ({
             <td>{product.name}</td>
             <td>
               {
-                product.categories.map( category => (
-                  <span>{category.name}{index<category.length-1 && ','}</span>
+                product.categories.map( (category, index) => (
+                  <span>{index<product.categories.length-1 ? category.name+', ' : category.name}</span>
                 ))
               }
             </td>

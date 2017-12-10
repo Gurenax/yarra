@@ -24,7 +24,8 @@ import {
   addCategory,
   getCategory,
   updateCategory,
-  addProductsToCategory
+  addProductToCategory,
+  removeProductFromCategory
 } from './api/category'
 import { getDecodedToken } from './api/token'
 // import { setToken } from './api/init'
@@ -132,10 +133,9 @@ class App extends Component {
         console.log('Product updated', product)
         product.categories.map(category => {
           console.log('Updating category', category)
-          addProductsToCategory(category, product._id)
+          addProductToCategory(category, product._id)
             .then(updatedCategory => {
               console.log('Updated category', updatedCategory)
-              this.loadCategoriesList()
             })
             .catch(error => {
               console.error(error)
@@ -172,6 +172,8 @@ class App extends Component {
           }
         })
         // this.loadProductsList()
+        // Reload categories list
+        this.loadCategoriesList()
       })
     } else {
       console.log('Adding new product..', data)
@@ -179,10 +181,9 @@ class App extends Component {
         console.log('Product added', product)
         product.categories.map(category => {
           console.log('Updating category', category)
-          addProductsToCategory(category, product._id)
+          addProductToCategory(category, product._id)
             .then(updatedCategory => {
               console.log('Updated category', updatedCategory)
-              this.loadCategoriesList()
             })
             .catch(error => {
               console.error(error)
@@ -205,6 +206,8 @@ class App extends Component {
           }
         })
         // this.loadProductsList()
+        // Reload categories list
+        this.loadCategoriesList()
       })
     }
   }
@@ -361,8 +364,6 @@ class App extends Component {
 
   onToggleCheckbox = event => {
     const categoryId = event.target.name
-    const newValue = event.target.value
-    console.log(categoryId, newValue)
     getCategory(categoryId).then(category => {
       this.setState(prevState => {
         const currentProduct = prevState.currentProduct
@@ -370,6 +371,10 @@ class App extends Component {
         const categoryIDs = categories.map(val => val._id)
         if (categoryIDs.indexOf(categoryId) > -1) {
           categories.pop(category)
+          removeProductFromCategory(category, currentProduct._id)
+          .then( (newCategory) => {
+            console.log('Removed product from category', newCategory)
+          })
         } else {
           categories.push(category)
         }
@@ -502,7 +507,7 @@ class App extends Component {
 
   // When the state changes
   componentDidUpdate(prevProps, prevState) {
-    console.log('Component Updated')
+    // console.log('Component Updated')
     if (this.state.decodedToken !== prevState.decodedToken) {
       this.loadProductsList()
     }

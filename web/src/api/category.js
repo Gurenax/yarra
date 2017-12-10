@@ -24,8 +24,16 @@ export const updateCategory = (category) => {
     })
 }
 
-export const addProductsToCategory = (category, productID) => {
+export const addProductToCategory = (category, productID) => {
   return api.put(`/categories/${category._id}/new_product/${productID}`)
+    .then( res => {
+      const newCategory = res.data
+      return newCategory
+    })
+}
+
+export const removeProductFromCategory = (category, productID) => {
+  return api.delete(`/categories/${category._id}/remove_product/${productID}`)
     .then( res => {
       const newCategory = res.data
       return newCategory
