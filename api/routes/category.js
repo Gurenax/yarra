@@ -78,7 +78,7 @@ router.put('/categories/:id/new_product/:productID', requireJWT, (req, res) => {
 // DELETE - Remove product from category
 router.delete('/categories/:id/remove_product/:productID', requireJWT, (req, res) => {
   const { id, productID } = req.params
-  const attributes = req.body
+  // const attributes = req.body
   Category.findOneAndUpdate(
     { _id: id },
     // The $addToSet operator adds a value to an array unless

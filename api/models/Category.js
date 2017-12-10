@@ -6,6 +6,15 @@ const categorySchema = new Schema({
   products: [{ type: Schema.ObjectId, ref: 'Product', default: [] }]
 })
 
+categorySchema.pre('remove', next => {
+  Product.update(
+      { categories : { $in : this._id } }, 
+      { $pull: { categories: this._id } },
+      { multi: true })  //if reference exists in multiple documents 
+  .exec();
+  next()
+})
+
 const Category = mongoose.model('Category', categorySchema)
 
 module.exports = Category
