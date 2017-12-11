@@ -572,8 +572,11 @@ class App extends Component {
   // When the state changes
   componentDidUpdate(prevProps, prevState) {
     // console.log('Component Updated')
+    // If the user token changes
     if (this.state.decodedToken !== prevState.decodedToken) {
       this.loadProductsList()
+      this.loadCategoriesList()
+      this.loadWishlist()
     }
   }
 }
