@@ -453,7 +453,7 @@ class App extends Component {
   render() {
     const {
       decodedToken,
-      showSignUpForm,
+      // showSignUpForm,
       products,
       categories,
       wishlist,
@@ -465,7 +465,7 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <Route path='/' exact render={ () => (
+          <Route path='/' render={ () => (
             <Fragment>
               <div className="jumbotron bg-primary text-light">
                 <h1 className="display-3">Yarra</h1>
@@ -475,57 +475,61 @@ class App extends Component {
               </div>
             </Fragment>
           ) } />
-          <Route path='/signin' exact render={ () => (
-            <Fragment>
-              <h2>Sign In</h2>
-              <SignInForm
-                onSignIn={this.onSignIn}
-                onRegister={this.toggleSignUp}
-                errorMessage={errors.signInError}
-              />
-            </Fragment>
-          )} />
 
           <div className="App-content container-fluid">
-            {signedIn ? (
-              <div className="alert alert-success" role="alert">
-                <h4 className="alert-heading">Signed in as: {decodedToken.email}</h4>
-                <hr/>
-                <p>Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}</p>
-                <p className="mb-0">Expired at: {new Date(decodedToken.exp * 1000).toISOString()}</p>
-                <hr/>
-                <button className="btn btn-success" onClick={this.onSignOut}>
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              !showSignUpForm && (
-                <div>
-                  
-                </div>
-              )
-            )}
+            <Route path='/signin' exact render={ () => (
+              <Fragment>
+                <h2>Sign In</h2>
+                <SignInForm
+                  onSignIn={this.onSignIn}
+                  onRegister={this.toggleSignUp}
+                  errorMessage={errors.signInError}
+                />
+              </Fragment>
+            )} />
 
-            {!!showSignUpForm && (
-              <div>
+            <Route path='/signup' exact render={ () => (
+              <Fragment>
+                <h2>Sign Up</h2>
                 <SignUpForm
                   onSignUp={this.onSignUp}
                   onBackToSignIn={this.toggleSignUp}
                 />
-              </div>
-            )}
+              </Fragment>
+            )} />
 
-            {signedIn &&
-              (!!products ? (
-                <ProductsList
-                  products={products}
-                  onClickGetProduct={this.onProductGet}
-                  onClickDeleteProduct={this.onProductDelete}
-                  onClickAddToWishlist={this.onAddToWishlist}
-                />
-              ) : (
-                <span>Loading...</span>
-              ))}
+            <Route path='/account' exact render={ () => (
+              <Fragment>
+                {signedIn && (
+                  <div className="alert alert-success" role="alert">
+                    <h4 className="alert-heading">Signed in as: {decodedToken.email}</h4>
+                    <hr/>
+                    <p>Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}</p>
+                    <p className="mb-0">Expired at: {new Date(decodedToken.exp * 1000).toISOString()}</p>
+                    <hr/>
+                    <button className="btn btn-success" onClick={this.onSignOut}>
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </Fragment>
+            )} />
+          
+            <Route path='/products' exact render={ () => (
+              <Fragment>
+                {signedIn &&
+                  (!!products ? (
+                    <ProductsList
+                      products={products}
+                      onClickGetProduct={this.onProductGet}
+                      onClickDeleteProduct={this.onProductDelete}
+                      onClickAddToWishlist={this.onAddToWishlist}
+                    />
+                  ) : (
+                    <span>Loading...</span>
+                  ))}
+              </Fragment>
+            )} />
 
             {signedIn && (
               <ProductForm
