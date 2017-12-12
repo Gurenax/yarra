@@ -36,8 +36,7 @@ const ProductsList = ({
             <td>
               <button
                 className="btn btn-primary"
-                onClick={onClickGetProduct}
-                name={product._id}
+                onClick={() => onClickGetProduct(product._id)}
               >
                 Edit
               </button>
@@ -45,8 +44,7 @@ const ProductsList = ({
             <td>
               <button
                 className="btn btn-primary"
-                name={product._id}
-                onClick={onClickDeleteProduct}
+                onClick={() => onClickDeleteProduct(product._id)}
               >
                 Delete
               </button>
@@ -54,8 +52,7 @@ const ProductsList = ({
             <td>
               <button
                 className="btn btn-primary"
-                name={product._id}
-                onClick={onClickAddToWishlist}
+                onClick={() => onClickAddToWishlist(product._id)}
               >
                 Add to Wishlist
               </button>

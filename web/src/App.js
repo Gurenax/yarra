@@ -69,16 +69,17 @@ class App extends Component {
     //   return
     // }
 
-    signIn(data).then(decodedToken => {
-      console.log('signed in', decodedToken)
-      this.setState({
-        decodedToken,
-        error: null
+    signIn(data)
+      .then(decodedToken => {
+        console.log('signed in', decodedToken)
+        this.setState({
+          decodedToken,
+          error: null
+        })
       })
-    })
-    .catch( error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   onSignOut = () => {
@@ -167,7 +168,7 @@ class App extends Component {
           // Reload categories list
           this.loadCategoriesList()
         })
-        .catch( error => {
+        .catch(error => {
           this.setState({ error })
         })
     } else {
@@ -206,7 +207,7 @@ class App extends Component {
           // Reload categories list
           this.loadCategoriesList()
         })
-        .catch( error => {
+        .catch(error => {
           this.setState({ error })
         })
     }
@@ -242,14 +243,12 @@ class App extends Component {
           error: null
         })
       })
-      .catch( error => {
+      .catch(error => {
         this.setState({ error })
       })
   }
 
-  onProductGet = event => {
-    event.preventDefault()
-    const productId = event.target.name
+  onProductGet = productId => {
     // console.log('Getting product...', productId)
     getProduct(productId).then(currentProduct => {
       // console.log('Found product', currentProduct)
@@ -259,9 +258,7 @@ class App extends Component {
     })
   }
 
-  onProductDelete = event => {
-    event.preventDefault()
-    const productId = event.target.name
+  onProductDelete = productId => {
     console.log('Deleting product...', productId)
     deleteProduct(productId)
       .then(currentProduct => {
@@ -286,7 +283,7 @@ class App extends Component {
       .then(() => {
         this.loadCategoriesList()
       })
-      .catch( error => {
+      .catch(error => {
         this.setState({ error })
       })
   }
@@ -326,9 +323,7 @@ class App extends Component {
   //   })
   // }
 
-  onAddToWishlist = event => {
-    event.preventDefault()
-    const productID = event.target.name
+  onAddToWishlist = productID => {
     console.log('Adding to wishlist', productID)
     addProductToWishlist(productID).then(newWishlist => {
       console.log('Product added to wishlist', newWishlist)
@@ -365,8 +360,7 @@ class App extends Component {
     })
   }
 
-  onCategoryDelete = event => {
-    const categoryID = event.target.name
+  onCategoryDelete = categoryID => {
     deleteCategory(categoryID)
       .then(category => {
         console.log('Category deleted', category)
@@ -429,9 +423,11 @@ class App extends Component {
     console.log(index)
   }
 
-  onCategoryUpdate = event => {
-    const index = event.target.name
-    const category = { ...this.state.categories[index] }
+  onCategoryUpdate = categoryID => {
+    const { categories } = this.state
+    const category = categories.filter(
+      c => c._id === categoryID
+    )[0]
     updateCategory(category).then(result => {
       console.log('Updated category', result)
     })
@@ -447,14 +443,9 @@ class App extends Component {
       error
     } = this.state
     const signedIn = !!decodedToken
-    
-    const requireAuth = (render) => (props) => (
-      !signedIn ? (
-        <Redirect to='/signin' />
-      ) : (
-        render(props)
-      )
-    )
+
+    const requireAuth = render => props =>
+      !signedIn ? <Redirect to="/signin" /> : render(props)
     /* Equivalent to */
     // function requireAuth(render) {
     //   return function renderThatChecksSignedIn({ match }) {
@@ -468,13 +459,8 @@ class App extends Component {
     //   }
     // }
 
-    const renderAlreadySignedIn = (render) => (props) => (
-      !!signedIn ? (
-        <Redirect to='/products' />
-      ): (
-        render(props)
-      )
-    )
+    const renderAlreadySignedIn = render => props =>
+      !!signedIn ? <Redirect to="/products" /> : render(props)
 
     return (
       <Router>
@@ -494,7 +480,6 @@ class App extends Component {
           />
 
           <div className="App-content container-fluid">
-
             <Route
               path="/"
               render={() => (
@@ -504,12 +489,12 @@ class App extends Component {
               )}
             />
 
-            { !!error && <Error error={error} /> }
+            {!!error && <Error error={error} />}
 
             <Route
               path="/signin"
               exact
-              render={ renderAlreadySignedIn(() => (
+              render={renderAlreadySignedIn(() => (
                 <Fragment>
                   <div className="mt-3">
                     <h2>Sign In</h2>
@@ -525,7 +510,7 @@ class App extends Component {
             <Route
               path="/signup"
               exact
-              render={ renderAlreadySignedIn(() => (
+              render={renderAlreadySignedIn(() => (
                 <Fragment>
                   <div className="mt-3">
                     <h2>Sign Up</h2>
@@ -541,7 +526,7 @@ class App extends Component {
             <Route
               path="/account"
               exact
-              render={ requireAuth(() => (
+              render={requireAuth(() => (
                 <Fragment>
                   {signedIn && (
                     <div className="alert alert-success mt-3" role="alert">
@@ -573,7 +558,7 @@ class App extends Component {
             <Route
               path="/products"
               exact
-              render={ requireAuth(() => (
+              render={requireAuth(() => (
                 <Fragment>
                   {signedIn &&
                     (!!products ? (
@@ -593,7 +578,7 @@ class App extends Component {
             <Route
               path="/products/admin"
               exact
-              render={ requireAuth(() => (
+              render={requireAuth(() => (
                 <Fragment>
                   {signedIn && (
                     <ProductForm
@@ -612,10 +597,10 @@ class App extends Component {
             <Route
               path="/wishlist"
               exact
-              render={ requireAuth(() => (
+              render={requireAuth(() => (
                 <Fragment>
-                  {signedIn && (
-                    !!wishlist && (
+                  {signedIn &&
+                    (!!wishlist && (
                       <Wishlist
                         products={wishlist.products}
                         onClickRemoveFromWishlist={this.onRemoveFromWishlist}

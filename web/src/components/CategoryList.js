@@ -28,8 +28,7 @@ const CategoryList = ({
               <td>
                 <button
                   className="btn btn-primary"
-                  name={index}
-                  onClick={onClickUpdateCategory}
+                  onClick={() => onClickUpdateCategory(category._id)}
                 >
                   Update
                 </button>
@@ -37,8 +36,7 @@ const CategoryList = ({
               <td>
                 <button
                   className="btn btn-primary"
-                  name={category._id}
-                  onClick={onClickDeleteCategory}
+                  onClick={() => onClickDeleteCategory(category._id)}
                 >
                   Delete
                 </button>
