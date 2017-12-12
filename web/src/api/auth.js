@@ -10,10 +10,10 @@ export const signIn = (data) => {
       return getDecodedToken()
     })
     .catch(error => {
-      console.error('error code', error.response.status)
-      return {
-        error: error.response.status
+      if (/ 401/.test(error.message)) {
+        error = new Error('The email/password combination were incorrect')
       }
+      throw error
     })
 }
 
