@@ -314,6 +314,14 @@ router.get('/products', authMiddleware.requireJWT, (req, res) => {
 
 1. `yarn add jwt-decode`
 
+
+## React Router
+
+1. `yarn add react-router-dom`
+2. In App.js, `import { BrowserRouter as Router, Route } from 'react-router-dom'`
+3. Import `Fragment`
+4. 
+
 ## Models
 ### Product
 - name: string

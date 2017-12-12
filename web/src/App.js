@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
@@ -459,89 +460,105 @@ class App extends Component {
       currentProduct,
       errors
     } = this.state
+    const signedIn = !!decodedToken
 
     return (
-      <div>
-        <div className="jumbotron bg-primary text-light">
-          <h1 className="display-3">Yarra</h1>
-          <p className="lead">
-            Now Delivering: Shipping trillions of new products
-          </p>
-        </div>
-        <div className="App container-fluid">
-          {!!decodedToken ? (
-            <div>
-              <p>Email: {decodedToken.email}</p>
-              <p>
-                Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}
-              </p>
-              <p>
-                Expired at: {new Date(decodedToken.exp * 1000).toISOString()}
-              </p>
-              <button className="btn btn-primary" onClick={this.onSignOut}>
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            !showSignUpForm && (
+      <Router>
+        <div className="App">
+          <Route path='/' exact render={ () => (
+            <Fragment>
+              <div className="jumbotron bg-primary text-light">
+                <h1 className="display-3">Yarra</h1>
+                <p className="lead">
+                  Now Delivering: Shipping trillions of new products
+                </p>
+              </div>
+            </Fragment>
+          ) } />
+          <Route path='/signin' exact render={ () => (
+            <Fragment>
+              <h2>Sign In</h2>
+              <SignInForm
+                onSignIn={this.onSignIn}
+                onRegister={this.toggleSignUp}
+                errorMessage={errors.signInError}
+              />
+            </Fragment>
+          )} />
+
+          <div className="App-content container-fluid">
+            {signedIn ? (
+              <div className="alert alert-success" role="alert">
+                <h4 className="alert-heading">Signed in as: {decodedToken.email}</h4>
+                <hr/>
+                <p>Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}</p>
+                <p className="mb-0">Expired at: {new Date(decodedToken.exp * 1000).toISOString()}</p>
+                <hr/>
+                <button className="btn btn-success" onClick={this.onSignOut}>
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              !showSignUpForm && (
+                <div>
+                  
+                </div>
+              )
+            )}
+
+            {!!showSignUpForm && (
               <div>
-                <SignInForm
-                  onSignIn={this.onSignIn}
-                  onRegister={this.toggleSignUp}
-                  errorMessage={errors.signInError}
+                <SignUpForm
+                  onSignUp={this.onSignUp}
+                  onBackToSignIn={this.toggleSignUp}
                 />
               </div>
-            )
-          )}
+            )}
 
-          {!!showSignUpForm && (
-            <div>
-              <SignUpForm
-                onSignUp={this.onSignUp}
-                onBackToSignIn={this.toggleSignUp}
-              />
-            </div>
-          )}
+            {signedIn &&
+              (!!products ? (
+                <ProductsList
+                  products={products}
+                  onClickGetProduct={this.onProductGet}
+                  onClickDeleteProduct={this.onProductDelete}
+                  onClickAddToWishlist={this.onAddToWishlist}
+                />
+              ) : (
+                <span>Loading...</span>
+              ))}
 
-          {!!decodedToken &&
-            (!!products ? (
-              <ProductsList
-                products={products}
-                onClickGetProduct={this.onProductGet}
-                onClickDeleteProduct={this.onProductDelete}
-                onClickAddToWishlist={this.onAddToWishlist}
-              />
-            ) : (
-              <span>Loading...</span>
-            ))}
-
-          {!!decodedToken && (
-            <ProductForm
-              onProductNew={this.onProductNew}
-              onProductSave={this.onProductSave}
-              currentProduct={currentProduct}
-              categories={categories}
-              onInputChange={this.onInputChange}
-              onToggleCheckbox={this.onToggleCheckbox}
-              errorMessage={errors.productSaveError}
-            />
-          )}
-
-          {!!decodedToken &&
-            !!wishlist && (
-              <Wishlist
-                products={wishlist.products}
-                onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+            {signedIn && (
+              <ProductForm
+                onProductNew={this.onProductNew}
+                onProductSave={this.onProductSave}
+                currentProduct={currentProduct}
+                categories={categories}
+                onInputChange={this.onInputChange}
+                onToggleCheckbox={this.onToggleCheckbox}
+                errorMessage={errors.productSaveError}
               />
             )}
 
-          {!!decodedToken &&
-            !!categories && <CategoryList categories={categories} onChangeCategoryName={this.onCategoryNameChanged} onClickUpdateCategory={this.onCategoryUpdate} onClickDeleteCategory={this.onCategoryDelete} />}
-          {!!decodedToken && (
-            <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
-          )}
+            <Route path='/wishlist' exact render={ () => (
+              <Fragment>
+                {signedIn &&
+                  !!wishlist && (
+                    <Wishlist
+                      products={wishlist.products}
+                      onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+                    />
+                  )}
+              </Fragment>
+            ) } />
+
+            {signedIn &&
+              !!categories && <CategoryList categories={categories} onChangeCategoryName={this.onCategoryNameChanged} onClickUpdateCategory={this.onCategoryUpdate} onClickDeleteCategory={this.onCategoryDelete} />}
+            {signedIn && (
+              <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
+            )}
+          </div>
         </div>
-      </div>
+      </Router>
     )
   }
 
