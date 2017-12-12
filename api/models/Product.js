@@ -2,8 +2,8 @@ const mongoose = require('./init')
 const Schema = mongoose.Schema
 
 const productSchema = new Schema({
-  brandName: String, // e.g. Holden
-  name: String, // e.g. Commodore
+  brandName: { type: String, required : true }, // e.g. Holden
+  name: { type: String, required : true }, // e.g. Commodore
   categories: [{ type: Schema.ObjectId, ref: 'Category', default: [] }]
 })
 

@@ -1,11 +1,21 @@
 import api from './init'
 
 export const listProducts = () => {
-  return api.get('/products').then(res => res.data)
+  return api
+    .get('/products')
+    .then(res => res.data)
+    .catch(error => {
+      throw error
+    })
 }
 
 export const getProduct = productId => {
-  return api.get(`/products/${productId}`).then(res => res.data)
+  return api
+    .get(`/products/${productId}`)
+    .then(res => res.data)
+    .catch(error => {
+      throw error
+    })
 }
 
 export const addProduct = product => {

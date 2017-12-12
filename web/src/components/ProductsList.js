@@ -43,12 +43,18 @@ const ProductsList = ({
               }
             </td>
             <td>
-              <button
+              {/* <button
                 className="btn btn-primary"
                 onClick={() => onClickEditProduct(product._id)}
               >
                 Edit
-              </button>
+              </button> */}
+              <Link to='/products/admin'
+                className="btn btn-primary"
+                onClick={() => onClickEditProduct(product._id)}
+              >
+                Edit
+              </Link>
             </td>
             <td>
               <button
@@ -70,20 +76,9 @@ const ProductsList = ({
         ))}
       </tbody>
     </table>
-    { !!currentProduct._id ? (
-      <ProductForm
-        onProductSave={onProductSave}
-        onProductFormCancel={onProductFormCancel}
-        currentProduct={currentProduct}
-        categories={categories}
-        onInputChange={onInputChange}
-        onToggleCheckbox={onToggleCheckbox}
-      />
-    ) : (
-      <Link className="btn btn-primary" to='/products/admin'>
-        New Product
-      </Link>
-    )}
+    <Link className="btn btn-primary" to='/products/admin'>
+      New Product
+    </Link>
   </div>
 )
 

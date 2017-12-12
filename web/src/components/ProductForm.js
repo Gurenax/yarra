@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const ProductForm = ({
   currentProduct,
@@ -78,11 +79,9 @@ const ProductForm = ({
         </div>
 
         <button className="btn btn-primary mr-1">Save</button>
-        { !!currentProduct._id &&
-        <button onClick={onProductFormCancel} className="btn btn-primary">
+        <Link to='/products' onClick={onProductFormCancel} className="btn btn-primary">
           Cancel
-        </button>
-        }
+        </Link>
       </form>
     </div>
   )

@@ -97,10 +97,12 @@ class App extends Component {
         }
       })
     })
+    .catch(error => {
+      this.setState({ error })
+    })
   }
 
   resetProductForm = event => {
-    event.preventDefault()
     this.setState({
       currentProduct: {
         id: '',
@@ -255,6 +257,9 @@ class App extends Component {
         currentProduct
       })
     })
+    .catch(error => {
+      this.setState({ error })
+    })
   }
 
   onProductEdit = productId => {
@@ -262,6 +267,9 @@ class App extends Component {
       this.setState({
         currentProduct
       })
+    })
+    .catch(error => {
+      this.setState({ error })
     })
   }
 
@@ -341,6 +349,9 @@ class App extends Component {
         }
       })
     })
+    .catch(error => {
+      this.setState({ error })
+    })
   }
 
   onRemoveFromWishlist = event => {
@@ -365,6 +376,9 @@ class App extends Component {
         }
       })
     })
+    .catch(error => {
+      this.setState({ error })
+    })
   }
 
   onCategoryDelete = categoryID => {
@@ -382,6 +396,9 @@ class App extends Component {
       })
       .then(() => {
         this.loadProductsList()
+      })
+      .catch(error => {
+        this.setState({ error })
       })
   }
 
@@ -437,6 +454,9 @@ class App extends Component {
     )[0]
     updateCategory(category).then(result => {
       console.log('Updated category', result)
+    })
+    .catch(error => {
+      this.setState({ error })
     })
   }
 
