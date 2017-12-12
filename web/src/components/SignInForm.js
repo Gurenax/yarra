@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SignInForm = ({ onSignIn, onRegister, errorMessage }) => {
+const SignInForm = ({ onSignIn, onRegister }) => {
   return (
     <form
       onSubmit={event => {
@@ -17,14 +17,6 @@ const SignInForm = ({ onSignIn, onRegister, errorMessage }) => {
         onSignIn({ email, password })
       }}
     >
-      {
-        !!errorMessage && (
-          <div className="alert alert-danger" role="alert">
-            {errorMessage}
-          </div>
-        )
-      }
-
       <label className="mb-2">
         {'Email: '}
         <input type="email" name="email" />

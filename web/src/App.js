@@ -8,6 +8,7 @@ import CategoryForm from './components/CategoryForm'
 import CategoryList from './components/CategoryList'
 import Wishlist from './components/Wishlist'
 import PrimaryNav from './components/PrimaryNav'
+import Error from './components/Error'
 import { signIn, signOutNow, signUpNow } from './api/auth'
 import {
   listProducts,
@@ -56,39 +57,32 @@ class App extends Component {
     errors: {
       signInError: null,
       productSaveError: null
-    }
+    },
+    error: null
   }
 
   onSignIn = data => {
     console.log('App received', data)
     console.log('Sign In', data.email, data.password)
-    if (data.email === '' || data.password === '') {
-      this.setState({
-        errors: {
-          signInError: 'Invalid username/password'
-        }
-      })
-      return
-    }
+    // if (data.email === '' || data.password === '') {
+    //   this.setState({
+    //     errors: {
+    //       signInError: 'Invalid username/password'
+    //     }
+    //   })
+    //   return
+    // }
 
     signIn(data).then(decodedToken => {
-      if (!decodedToken.error) {
-        console.log('signed in', decodedToken)
-        this.setState({
-          decodedToken,
-          errors: {
-            signInError: ''
-          }
-        })
-        // this.loadProductsList() // use componentDidUpdate() instead to reload
-      } else {
-        this.setState({
-          errors: {
-            signInError: 'Invalid username/password'
-          }
-        })
-        return
-      }
+      console.log('signed in', decodedToken)
+      this.setState({
+        decodedToken,
+        error: null
+      })
+    })
+    .catch( error => {
+      console.log(error)
+      this.setState({ error })
     })
   }
 
@@ -463,7 +457,8 @@ class App extends Component {
       categories,
       wishlist,
       currentProduct,
-      errors
+      errors,
+      error // Patrick's
     } = this.state
     const signedIn = !!decodedToken
     
@@ -487,13 +482,13 @@ class App extends Component {
     //   }
     // }
 
-    const renderAccount = (render) => (props) => (
-      !!signedIn ? (
-        <Redirect to='/account' />
-      ): (
-        render(props)
-      )
-    )
+    // const renderAccount = (render) => (props) => (
+    //   !!signedIn ? (
+    //     <Redirect to='/account' />
+    //   ): (
+    //     render(props)
+    //   )
+    // )
 
     return (
       <Router>
@@ -513,6 +508,7 @@ class App extends Component {
           />
 
           <div className="App-content container-fluid">
+
             <Route
               path="/"
               render={() => (
@@ -522,36 +518,45 @@ class App extends Component {
               )}
             />
 
+            { !!error && <Error error={error} /> }
+
             <Route
               path="/signin"
               exact
-              render={renderAccount(() => (
-                <Fragment>
-                  <div className="mt-3">
-                    <h2>Sign In</h2>
-                    <SignInForm
-                      onSignIn={this.onSignIn}
-                      // onRegister={this.toggleSignUp}
-                      errorMessage={errors.signInError}
-                    />
-                  </div>
-                </Fragment>
-              ))}
+              render={() => (
+                !!signedIn ? (
+                  <Redirect to='/products' />
+                ) : (
+                  <Fragment>
+                    <div className="mt-3">
+                      <h2>Sign In</h2>
+                      <SignInForm
+                        onSignIn={this.onSignIn}
+                        // onRegister={this.toggleSignUp}
+                      />
+                    </div>
+                  </Fragment>
+                )
+              )}
             />
 
             <Route
               path="/signup"
               exact
               render={() => (
-                <Fragment>
-                  <div className="mt-3">
-                    <h2>Sign Up</h2>
-                    <SignUpForm
-                      onSignUp={this.onSignUp}
-                      // onBackToSignIn={this.toggleSignUp}
-                    />
-                  </div>
-                </Fragment>
+                !!signedIn ? (
+                  <Redirect to='/products' />
+                ) : (
+                  <Fragment>
+                    <div className="mt-3">
+                      <h2>Sign Up</h2>
+                      <SignUpForm
+                        onSignUp={this.onSignUp}
+                        // onBackToSignIn={this.toggleSignUp}
+                      />
+                    </div>
+                  </Fragment>
+                )
               )}
             />
 
