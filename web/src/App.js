@@ -482,13 +482,13 @@ class App extends Component {
     //   }
     // }
 
-    // const renderAccount = (render) => (props) => (
-    //   !!signedIn ? (
-    //     <Redirect to='/account' />
-    //   ): (
-    //     render(props)
-    //   )
-    // )
+    const renderAlreadySignedIn = (render) => (props) => (
+      !!signedIn ? (
+        <Redirect to='/products' />
+      ): (
+        render(props)
+      )
+    )
 
     return (
       <Router>
@@ -523,41 +523,33 @@ class App extends Component {
             <Route
               path="/signin"
               exact
-              render={() => (
-                !!signedIn ? (
-                  <Redirect to='/products' />
-                ) : (
-                  <Fragment>
-                    <div className="mt-3">
-                      <h2>Sign In</h2>
-                      <SignInForm
-                        onSignIn={this.onSignIn}
-                        // onRegister={this.toggleSignUp}
-                      />
-                    </div>
-                  </Fragment>
-                )
-              )}
+              render={ renderAlreadySignedIn(() => (
+                <Fragment>
+                  <div className="mt-3">
+                    <h2>Sign In</h2>
+                    <SignInForm
+                      onSignIn={this.onSignIn}
+                      // onRegister={this.toggleSignUp}
+                    />
+                  </div>
+                </Fragment>
+              ))}
             />
 
             <Route
               path="/signup"
               exact
-              render={() => (
-                !!signedIn ? (
-                  <Redirect to='/products' />
-                ) : (
-                  <Fragment>
-                    <div className="mt-3">
-                      <h2>Sign Up</h2>
-                      <SignUpForm
-                        onSignUp={this.onSignUp}
-                        // onBackToSignIn={this.toggleSignUp}
-                      />
-                    </div>
-                  </Fragment>
-                )
-              )}
+              render={ renderAlreadySignedIn(() => (
+                <Fragment>
+                  <div className="mt-3">
+                    <h2>Sign Up</h2>
+                    <SignUpForm
+                      onSignUp={this.onSignUp}
+                      // onBackToSignIn={this.toggleSignUp}
+                    />
+                  </div>
+                </Fragment>
+              ))}
             />
 
             <Route
