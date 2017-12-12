@@ -1,10 +1,19 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+import ProductForm from './ProductForm'
 
 const ProductsList = ({
   products,
   onClickGetProduct,
+  onClickEditProduct,
   onClickDeleteProduct,
-  onClickAddToWishlist
+  onClickAddToWishlist,
+  currentProduct,
+  categories,
+  onProductSave,
+  onProductFormCancel,
+  onInputChange,
+  onToggleCheckbox
 }) => (
   <div className="mt-3">
     <h2>{!!products && products.length > 0 && products.length} Products</h2>
@@ -36,7 +45,7 @@ const ProductsList = ({
             <td>
               <button
                 className="btn btn-primary"
-                onClick={() => onClickGetProduct(product._id)}
+                onClick={() => onClickEditProduct(product._id)}
               >
                 Edit
               </button>
@@ -61,6 +70,20 @@ const ProductsList = ({
         ))}
       </tbody>
     </table>
+    { !!currentProduct._id ? (
+      <ProductForm
+        onProductSave={onProductSave}
+        onProductFormCancel={onProductFormCancel}
+        currentProduct={currentProduct}
+        categories={categories}
+        onInputChange={onInputChange}
+        onToggleCheckbox={onToggleCheckbox}
+      />
+    ) : (
+      <Link className="btn btn-primary" to='/products/admin'>
+        New Product
+      </Link>
+    )}
   </div>
 )
 

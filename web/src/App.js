@@ -99,8 +99,7 @@ class App extends Component {
     })
   }
 
-  onProductNew = event => {
-    console.log('New product..')
+  resetProductForm = event => {
     event.preventDefault()
     this.setState({
       currentProduct: {
@@ -252,6 +251,14 @@ class App extends Component {
     // console.log('Getting product...', productId)
     getProduct(productId).then(currentProduct => {
       // console.log('Found product', currentProduct)
+      this.setState({
+        currentProduct
+      })
+    })
+  }
+
+  onProductEdit = productId => {
+    getProduct(productId).then(currentProduct => {
       this.setState({
         currentProduct
       })
@@ -565,8 +572,15 @@ class App extends Component {
                       <ProductsList
                         products={products}
                         onClickGetProduct={this.onProductGet}
+                        onClickEditProduct={this.onProductEdit}
                         onClickDeleteProduct={this.onProductDelete}
                         onClickAddToWishlist={this.onAddToWishlist}
+                        onProductSave={this.onProductSave}
+                        onProductFormCancel={this.resetProductForm}
+                        currentProduct={currentProduct}
+                        categories={categories}
+                        onInputChange={this.onInputChange}
+                        onToggleCheckbox={this.onToggleCheckbox}
                       />
                     ) : (
                       <span>Loading...</span>
@@ -582,8 +596,8 @@ class App extends Component {
                 <Fragment>
                   {signedIn && (
                     <ProductForm
-                      onProductNew={this.onProductNew}
                       onProductSave={this.onProductSave}
+                      onProductFormCancel={this.resetProductForm}
                       currentProduct={currentProduct}
                       categories={categories}
                       onInputChange={this.onInputChange}

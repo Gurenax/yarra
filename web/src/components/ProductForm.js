@@ -3,11 +3,10 @@ import React from 'react'
 const ProductForm = ({
   currentProduct,
   categories,
-  onProductNew,
   onProductSave,
+  onProductFormCancel,
   onInputChange,
-  onToggleCheckbox,
-  errorMessage,
+  onToggleCheckbox
 }) => {
   return (
     <div className="mt-3">
@@ -28,12 +27,6 @@ const ProductForm = ({
           onProductSave({ id, brandName, name })
         }}
       >
-        {!!errorMessage && (
-          <div className="alert alert-danger" role="alert">
-            {errorMessage}
-          </div>
-        )}
-
         <input
           type="hidden"
           name="id"
@@ -59,7 +52,7 @@ const ProductForm = ({
           />
         </label>
 
-        <label className="mb-2">
+        {/* <label className="mb-2">
           {'Categories: '}
           <input
             type="text"
@@ -71,7 +64,7 @@ const ProductForm = ({
               }, '' )) || ''}
             onChange={onInputChange}
           />
-        </label>
+        </label> */}
         <div className="mb-2">
           {'Categories: '}
           {!!categories && categories.map( (category, index) => (
@@ -84,10 +77,12 @@ const ProductForm = ({
           ))}
         </div>
 
-        <button onClick={onProductNew} className="btn btn-primary mr-1">
-          New Product
+        <button className="btn btn-primary mr-1">Save</button>
+        { !!currentProduct._id &&
+        <button onClick={onProductFormCancel} className="btn btn-primary">
+          Cancel
         </button>
-        <button className="btn btn-primary">Save Product</button>
+        }
       </form>
     </div>
   )
