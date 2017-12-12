@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
@@ -7,6 +7,7 @@ import ProductForm from './components/ProductForm'
 import CategoryForm from './components/CategoryForm'
 import CategoryList from './components/CategoryList'
 import Wishlist from './components/Wishlist'
+import PrimaryNav from './components/PrimaryNav'
 import { signIn, signOutNow, signUpNow } from './api/auth'
 import {
   listProducts,
@@ -465,6 +466,34 @@ class App extends Component {
       errors
     } = this.state
     const signedIn = !!decodedToken
+    
+    const requireAuth = (render) => (props) => (
+      !signedIn ? (
+        <Redirect to='/signin' />
+      ) : (
+        render(props)
+      )
+    )
+    /* Equivalent to */
+    // function requireAuth(render) {
+    //   return function renderThatChecksSignedIn({ match }) {
+    //     return (
+    //       signedIn ? (
+    //         render()
+    //       ) : (
+    //         <Redirect to='/signin' />
+    //       )
+    //     )
+    //   }
+    // }
+
+    const renderAccount = (render) => (props) => (
+      !!signedIn ? (
+        <Redirect to='/account' />
+      ): (
+        render(props)
+      )
+    )
 
     return (
       <Router>
@@ -485,18 +514,29 @@ class App extends Component {
 
           <div className="App-content container-fluid">
             <Route
-              path="/signin"
-              exact
+              path="/"
               render={() => (
                 <Fragment>
-                  <h2>Sign In</h2>
-                  <SignInForm
-                    onSignIn={this.onSignIn}
-                    // onRegister={this.toggleSignUp}
-                    errorMessage={errors.signInError}
-                  />
+                  <PrimaryNav signedIn={signedIn} />
                 </Fragment>
               )}
+            />
+
+            <Route
+              path="/signin"
+              exact
+              render={renderAccount(() => (
+                <Fragment>
+                  <div className="mt-3">
+                    <h2>Sign In</h2>
+                    <SignInForm
+                      onSignIn={this.onSignIn}
+                      // onRegister={this.toggleSignUp}
+                      errorMessage={errors.signInError}
+                    />
+                  </div>
+                </Fragment>
+              ))}
             />
 
             <Route
@@ -504,11 +544,13 @@ class App extends Component {
               exact
               render={() => (
                 <Fragment>
-                  <h2>Sign Up</h2>
-                  <SignUpForm
-                    onSignUp={this.onSignUp}
-                    // onBackToSignIn={this.toggleSignUp}
-                  />
+                  <div className="mt-3">
+                    <h2>Sign Up</h2>
+                    <SignUpForm
+                      onSignUp={this.onSignUp}
+                      // onBackToSignIn={this.toggleSignUp}
+                    />
+                  </div>
                 </Fragment>
               )}
             />
@@ -516,10 +558,10 @@ class App extends Component {
             <Route
               path="/account"
               exact
-              render={() => (
+              render={ requireAuth(() => (
                 <Fragment>
                   {signedIn && (
-                    <div className="alert alert-success" role="alert">
+                    <div className="alert alert-success mt-3" role="alert">
                       <h4 className="alert-heading">
                         Signed in as: {decodedToken.email}
                       </h4>
@@ -542,13 +584,13 @@ class App extends Component {
                     </div>
                   )}
                 </Fragment>
-              )}
+              ))}
             />
 
             <Route
               path="/products"
               exact
-              render={() => (
+              render={ requireAuth(() => (
                 <Fragment>
                   {signedIn &&
                     (!!products ? (
@@ -562,13 +604,13 @@ class App extends Component {
                       <span>Loading...</span>
                     ))}
                 </Fragment>
-              )}
+              ))}
             />
 
             <Route
               path="/products/admin"
               exact
-              render={() => (
+              render={ requireAuth(() => (
                 <Fragment>
                   {signedIn && (
                     <ProductForm
@@ -582,29 +624,29 @@ class App extends Component {
                     />
                   )}
                 </Fragment>
-              )}
+              ))}
             />
 
             <Route
               path="/wishlist"
               exact
-              render={() => (
+              render={ requireAuth(() => (
                 <Fragment>
-                  {signedIn &&
+                  {signedIn && (
                     !!wishlist && (
                       <Wishlist
                         products={wishlist.products}
                         onClickRemoveFromWishlist={this.onRemoveFromWishlist}
                       />
-                    )}
+                    ))}
                 </Fragment>
-              )}
+              ))}
             />
 
             <Route
               path="/categories"
               exact
-              render={() => (
+              render={requireAuth(() => (
                 <Fragment>
                   {signedIn &&
                     !!categories && (
@@ -621,7 +663,7 @@ class App extends Component {
                     />
                   )}
                 </Fragment>
-              )}
+              ))}
             />
           </div>
         </div>
