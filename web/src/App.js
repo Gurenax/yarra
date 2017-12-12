@@ -54,10 +54,6 @@ class App extends Component {
       name: '',
       categories: []
     },
-    errors: {
-      signInError: null,
-      productSaveError: null
-    },
     error: null
   }
 
@@ -81,14 +77,13 @@ class App extends Component {
       })
     })
     .catch( error => {
-      console.log(error)
       this.setState({ error })
     })
   }
 
   onSignOut = () => {
     signOutNow()
-    this.setState({ decodedToken: null })
+    this.setState({ decodedToken: null, error: null })
   }
 
   onSignUp = data => {
@@ -113,21 +108,19 @@ class App extends Component {
         name: '',
         categories: []
       },
-      errors: {
-        productSaveError: null
-      }
+      error: null
     })
   }
 
   onProductSave = data => {
-    if (!data.brandName || !data.name) {
-      this.setState({
-        errors: {
-          productSaveError: 'Invalid product'
-        }
-      })
-      return
-    }
+    // if (!data.brandName || !data.name) {
+    //   this.setState({
+    //     errors: {
+    //       productSaveError: 'Invalid product'
+    //     }
+    //   })
+    //   return
+    // }
     console.log('Saving product..', data)
     data = { ...data, categories: this.state.currentProduct.categories }
     if (data.id) {
@@ -165,15 +158,7 @@ class App extends Component {
             })
             return {
               products,
-              // currentProduct: {
-              //   id: '',
-              //   brandName: '',
-              //   name: '',
-              //   categories: []
-              // },
-              errors: {
-                productSaveError: null
-              }
+              error: null
             }
           })
           // this.loadProductsList()
@@ -181,6 +166,9 @@ class App extends Component {
         .then(() => {
           // Reload categories list
           this.loadCategoriesList()
+        })
+        .catch( error => {
+          this.setState({ error })
         })
     } else {
       console.log('Adding new product..', data)
@@ -209,9 +197,7 @@ class App extends Component {
                 name: '',
                 categories: []
               },
-              errors: {
-                productSaveError: null
-              }
+              error: null
             }
           })
           // this.loadProductsList()
@@ -219,6 +205,9 @@ class App extends Component {
         .then(() => {
           // Reload categories list
           this.loadCategoriesList()
+        })
+        .catch( error => {
+          this.setState({ error })
         })
     }
   }
@@ -250,13 +239,11 @@ class App extends Component {
             name: '',
             categories: []
           },
-          errors: {
-            productSaveError: null
-          }
+          error: null
         })
       })
-      .catch(error => {
-        console.error('error loading products', error)
+      .catch( error => {
+        this.setState({ error })
       })
   }
 
@@ -291,15 +278,16 @@ class App extends Component {
               name: '',
               categories: []
             },
-            errors: {
-              productSaveError: null
-            }
+            error: null
           }
         })
         // this.loadProductsList()
       })
       .then(() => {
         this.loadCategoriesList()
+      })
+      .catch( error => {
+        this.setState({ error })
       })
   }
 
@@ -452,13 +440,11 @@ class App extends Component {
   render() {
     const {
       decodedToken,
-      // showSignUpForm,
       products,
       categories,
       wishlist,
       currentProduct,
-      errors,
-      error // Patrick's
+      error
     } = this.state
     const signedIn = !!decodedToken
     
@@ -617,7 +603,6 @@ class App extends Component {
                       categories={categories}
                       onInputChange={this.onInputChange}
                       onToggleCheckbox={this.onToggleCheckbox}
-                      errorMessage={errors.productSaveError}
                     />
                   )}
                 </Fragment>
