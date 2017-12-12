@@ -34,7 +34,7 @@ import { getDecodedToken } from './api/token'
 import './App.css'
 
 const removeItemIDFromArray = (id, array) => {
-  const index = array.map(val=>val._id).indexOf(id)
+  const index = array.map(val => val._id).indexOf(id)
   console.log('removing index', index)
   return array.splice(index, 1)
 }
@@ -42,7 +42,7 @@ const removeItemIDFromArray = (id, array) => {
 class App extends Component {
   state = {
     decodedToken: getDecodedToken(), // Restore the previous signed in data
-    showSignUpForm: false,
+    // showSignUpForm: false,
     products: null,
     categories: null,
     wishlist: null,
@@ -101,8 +101,8 @@ class App extends Component {
       console.log('signed up', decodedToken)
       this.setState(prevState => {
         return {
-          decodedToken,
-          showSignUpForm: false
+          decodedToken //,
+          // showSignUpForm: false
         }
       })
     })
@@ -137,92 +137,94 @@ class App extends Component {
     data = { ...data, categories: this.state.currentProduct.categories }
     if (data.id) {
       console.log('Updating product..', data)
-      updateProduct(data).then(product => {
-        console.log('Product updated', product)
-        product.categories.map(category => {
-          console.log('Updating category', category)
-          addProductToCategory(category, product._id)
-            .then(updatedCategory => {
-              console.log('Updated category', updatedCategory)
-            })
-            .catch(error => {
-              console.error(error)
-            })
-          return null
-        })
+      updateProduct(data)
+        .then(product => {
+          console.log('Product updated', product)
+          product.categories.map(category => {
+            console.log('Updating category', category)
+            addProductToCategory(category, product._id)
+              .then(updatedCategory => {
+                console.log('Updated category', updatedCategory)
+              })
+              .catch(error => {
+                console.error(error)
+              })
+            return null
+          })
 
-        this.setState(prevState => {
-          const prevProducts = prevState.products
-          const products = prevProducts.map(item => {
-            // If product being edited is found
-            if (item._id === product._id) {
-              const copy = {
-                ...item,
-                name: product.name,
-                brandName: product.brandName,
-                categories: product.categories
+          this.setState(prevState => {
+            const prevProducts = prevState.products
+            const products = prevProducts.map(item => {
+              // If product being edited is found
+              if (item._id === product._id) {
+                const copy = {
+                  ...item,
+                  name: product.name,
+                  brandName: product.brandName,
+                  categories: product.categories
+                }
+                return copy
+              } else {
+                return item
               }
-              return copy
-            } else {
-              return item
+            })
+            return {
+              products,
+              // currentProduct: {
+              //   id: '',
+              //   brandName: '',
+              //   name: '',
+              //   categories: []
+              // },
+              errors: {
+                productSaveError: null
+              }
             }
           })
-          return {
-            products,
-            // currentProduct: {
-            //   id: '',
-            //   brandName: '',
-            //   name: '',
-            //   categories: []
-            // },
-            errors: {
-              productSaveError: null
-            }
-          }
+          // this.loadProductsList()
         })
-        // this.loadProductsList()
-      })
-      .then( () => {
-        // Reload categories list
-        this.loadCategoriesList()
-      })
+        .then(() => {
+          // Reload categories list
+          this.loadCategoriesList()
+        })
     } else {
       console.log('Adding new product..', data)
-      addProduct(data).then(product => {
-        console.log('Product added', product)
-        product.categories.map(category => {
-          console.log('Updating category', category)
-          addProductToCategory(category, product._id)
-            .then(updatedCategory => {
-              console.log('Updated category', updatedCategory)
-            })
-            .catch(error => {
-              console.error(error)
-            })
-          return null
-        })
+      addProduct(data)
+        .then(product => {
+          console.log('Product added', product)
+          product.categories.map(category => {
+            console.log('Updating category', category)
+            addProductToCategory(category, product._id)
+              .then(updatedCategory => {
+                console.log('Updated category', updatedCategory)
+              })
+              .catch(error => {
+                console.error(error)
+              })
+            return null
+          })
 
-        this.setState(prevState => {
-          const products = prevState.products.concat(product)
-          return {
-            products,
-            currentProduct: {
-              id: '',
-              brandName: '',
-              name: '',
-              categories: []
-            },
-            errors: {
-              productSaveError: null
+          this.setState(prevState => {
+            const products = prevState.products.concat(product)
+            return {
+              products,
+              currentProduct: {
+                id: '',
+                brandName: '',
+                name: '',
+                categories: []
+              },
+              errors: {
+                productSaveError: null
+              }
             }
-          }
+          })
+          // this.loadProductsList()
         })
-        // this.loadProductsList()
-      })
-      .then( () => {
-        // Reload categories list
-        this.loadCategoriesList()
-      })
+        .then(() => {
+          // Reload categories list
+          this.loadCategoriesList()
+        })
     }
   }
 
@@ -279,30 +281,31 @@ class App extends Component {
     event.preventDefault()
     const productId = event.target.name
     console.log('Deleting product...', productId)
-    deleteProduct(productId).then(currentProduct => {
-      console.log('Deleted product', currentProduct)
-      this.setState(prevState => {
-        const prevProducts = prevState.products
-        // Filter only products which are not deleted
-        const products = prevProducts.filter(item => item._id !== productId)
-        return {
-          products,
-          currentProduct: {
-            id: '',
-            brandName: '',
-            name: '',
-            categories: []
-          },
-          errors: {
-            productSaveError: null
+    deleteProduct(productId)
+      .then(currentProduct => {
+        console.log('Deleted product', currentProduct)
+        this.setState(prevState => {
+          const prevProducts = prevState.products
+          // Filter only products which are not deleted
+          const products = prevProducts.filter(item => item._id !== productId)
+          return {
+            products,
+            currentProduct: {
+              id: '',
+              brandName: '',
+              name: '',
+              categories: []
+            },
+            errors: {
+              productSaveError: null
+            }
           }
-        }
+        })
+        // this.loadProductsList()
       })
-      // this.loadProductsList()
-    })
-    .then( () => {
-      this.loadCategoriesList()
-    })
+      .then(() => {
+        this.loadCategoriesList()
+      })
   }
 
   onInputChange = event => {
@@ -325,20 +328,20 @@ class App extends Component {
     }
   }
 
-  toggleSignUp = event => {
-    console.log('Signing up..')
-    event.preventDefault()
-    // showSignUpForm()
-    this.setState(prevState => {
-      const signedUpShown = prevState.showSignUpForm
-      return {
-        showSignUpForm: !signedUpShown,
-        errors: {
-          signInError: ''
-        }
-      }
-    })
-  }
+  // toggleSignUp = event => {
+  //   console.log('Signing up..')
+  //   event.preventDefault()
+  //   // showSignUpForm()
+  //   this.setState(prevState => {
+  //     const signedUpShown = prevState.showSignUpForm
+  //     return {
+  //       showSignUpForm: !signedUpShown,
+  //       errors: {
+  //         signInError: ''
+  //       }
+  //     }
+  //   })
+  // }
 
   onAddToWishlist = event => {
     event.preventDefault()
@@ -381,20 +384,21 @@ class App extends Component {
 
   onCategoryDelete = event => {
     const categoryID = event.target.name
-    deleteCategory(categoryID).then(category => {
-    console.log('Category deleted', category)
-      this.setState(prevState => {
-        const categories = prevState.categories.filter( item => {
-          return item._id !== category._id
+    deleteCategory(categoryID)
+      .then(category => {
+        console.log('Category deleted', category)
+        this.setState(prevState => {
+          const categories = prevState.categories.filter(item => {
+            return item._id !== category._id
+          })
+          return {
+            categories
+          }
         })
-        return {
-          categories
-        }
       })
-    })
-    .then( () => {
-      this.loadProductsList()
-    })
+      .then(() => {
+        this.loadProductsList()
+      })
   }
 
   onToggleCheckbox = event => {
@@ -405,15 +409,15 @@ class App extends Component {
         let categories = currentProduct.categories
         const categoryIDs = categories.map(val => val._id)
         if (categoryIDs.indexOf(categoryId) > -1) {
-          
           // Update UI
           categories = removeItemIDFromArray(category._id, categories)
 
           // Update API
-          removeProductFromCategory(category, currentProduct._id)
-          .then( (result) => {
-            console.log('Removed product from category', result)
-          })
+          removeProductFromCategory(category, currentProduct._id).then(
+            result => {
+              console.log('Removed product from category', result)
+            }
+          )
         } else {
           categories.push(category)
         }
@@ -424,11 +428,11 @@ class App extends Component {
     })
   }
 
-  onCategoryNameChanged = (event) => {
+  onCategoryNameChanged = event => {
     const index = event.target.name
     const value = event.target.value
 
-    this.setState( prevState => {
+    this.setState(prevState => {
       const categories = prevState.categories
       categories[index].name = value
       return {
@@ -437,15 +441,15 @@ class App extends Component {
     })
   }
 
-  toggleUpdateButton = (event) => {
+  toggleUpdateButton = event => {
     const index = event.target.name
     console.log(index)
   }
 
-  onCategoryUpdate = (event) => {
+  onCategoryUpdate = event => {
     const index = event.target.name
-    const category = {...this.state.categories[index]}
-    updateCategory(category).then( result => {
+    const category = { ...this.state.categories[index] }
+    updateCategory(category).then(result => {
       console.log('Updated category', result)
     })
   }
@@ -465,101 +469,160 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <Route path='/' render={ () => (
-            <Fragment>
-              <div className="jumbotron bg-primary text-light">
-                <h1 className="display-3">Yarra</h1>
-                <p className="lead">
-                  Now Delivering: Shipping trillions of new products
-                </p>
-              </div>
-            </Fragment>
-          ) } />
+          <Route
+            path="/"
+            render={() => (
+              <Fragment>
+                <div className="jumbotron bg-primary text-light">
+                  <h1 className="display-3">Yarra</h1>
+                  <p className="lead">
+                    Now Delivering: Shipping trillions of new products
+                  </p>
+                </div>
+              </Fragment>
+            )}
+          />
 
           <div className="App-content container-fluid">
-            <Route path='/signin' exact render={ () => (
-              <Fragment>
-                <h2>Sign In</h2>
-                <SignInForm
-                  onSignIn={this.onSignIn}
-                  onRegister={this.toggleSignUp}
-                  errorMessage={errors.signInError}
-                />
-              </Fragment>
-            )} />
+            <Route
+              path="/signin"
+              exact
+              render={() => (
+                <Fragment>
+                  <h2>Sign In</h2>
+                  <SignInForm
+                    onSignIn={this.onSignIn}
+                    // onRegister={this.toggleSignUp}
+                    errorMessage={errors.signInError}
+                  />
+                </Fragment>
+              )}
+            />
 
-            <Route path='/signup' exact render={ () => (
-              <Fragment>
-                <h2>Sign Up</h2>
-                <SignUpForm
-                  onSignUp={this.onSignUp}
-                  onBackToSignIn={this.toggleSignUp}
-                />
-              </Fragment>
-            )} />
+            <Route
+              path="/signup"
+              exact
+              render={() => (
+                <Fragment>
+                  <h2>Sign Up</h2>
+                  <SignUpForm
+                    onSignUp={this.onSignUp}
+                    // onBackToSignIn={this.toggleSignUp}
+                  />
+                </Fragment>
+              )}
+            />
 
-            <Route path='/account' exact render={ () => (
-              <Fragment>
-                {signedIn && (
-                  <div className="alert alert-success" role="alert">
-                    <h4 className="alert-heading">Signed in as: {decodedToken.email}</h4>
-                    <hr/>
-                    <p>Signed in at: {new Date(decodedToken.iat * 1000).toISOString()}</p>
-                    <p className="mb-0">Expired at: {new Date(decodedToken.exp * 1000).toISOString()}</p>
-                    <hr/>
-                    <button className="btn btn-success" onClick={this.onSignOut}>
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </Fragment>
-            )} />
-          
-            <Route path='/products' exact render={ () => (
-              <Fragment>
-                {signedIn &&
-                  (!!products ? (
-                    <ProductsList
-                      products={products}
-                      onClickGetProduct={this.onProductGet}
-                      onClickDeleteProduct={this.onProductDelete}
-                      onClickAddToWishlist={this.onAddToWishlist}
-                    />
-                  ) : (
-                    <span>Loading...</span>
-                  ))}
-              </Fragment>
-            )} />
+            <Route
+              path="/account"
+              exact
+              render={() => (
+                <Fragment>
+                  {signedIn && (
+                    <div className="alert alert-success" role="alert">
+                      <h4 className="alert-heading">
+                        Signed in as: {decodedToken.email}
+                      </h4>
+                      <hr />
+                      <p>
+                        Signed in at:{' '}
+                        {new Date(decodedToken.iat * 1000).toISOString()}
+                      </p>
+                      <p className="mb-0">
+                        Expired at:{' '}
+                        {new Date(decodedToken.exp * 1000).toISOString()}
+                      </p>
+                      <hr />
+                      <button
+                        className="btn btn-success"
+                        onClick={this.onSignOut}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </Fragment>
+              )}
+            />
 
-            {signedIn && (
-              <ProductForm
-                onProductNew={this.onProductNew}
-                onProductSave={this.onProductSave}
-                currentProduct={currentProduct}
-                categories={categories}
-                onInputChange={this.onInputChange}
-                onToggleCheckbox={this.onToggleCheckbox}
-                errorMessage={errors.productSaveError}
-              />
-            )}
+            <Route
+              path="/products"
+              exact
+              render={() => (
+                <Fragment>
+                  {signedIn &&
+                    (!!products ? (
+                      <ProductsList
+                        products={products}
+                        onClickGetProduct={this.onProductGet}
+                        onClickDeleteProduct={this.onProductDelete}
+                        onClickAddToWishlist={this.onAddToWishlist}
+                      />
+                    ) : (
+                      <span>Loading...</span>
+                    ))}
+                </Fragment>
+              )}
+            />
 
-            <Route path='/wishlist' exact render={ () => (
-              <Fragment>
-                {signedIn &&
-                  !!wishlist && (
-                    <Wishlist
-                      products={wishlist.products}
-                      onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+            <Route
+              path="/products/admin"
+              exact
+              render={() => (
+                <Fragment>
+                  {signedIn && (
+                    <ProductForm
+                      onProductNew={this.onProductNew}
+                      onProductSave={this.onProductSave}
+                      currentProduct={currentProduct}
+                      categories={categories}
+                      onInputChange={this.onInputChange}
+                      onToggleCheckbox={this.onToggleCheckbox}
+                      errorMessage={errors.productSaveError}
                     />
                   )}
-              </Fragment>
-            ) } />
+                </Fragment>
+              )}
+            />
 
-            {signedIn &&
-              !!categories && <CategoryList categories={categories} onChangeCategoryName={this.onCategoryNameChanged} onClickUpdateCategory={this.onCategoryUpdate} onClickDeleteCategory={this.onCategoryDelete} />}
-            {signedIn && (
-              <CategoryForm onSubmitCreateCategory={this.onCategorySave} />
-            )}
+            <Route
+              path="/wishlist"
+              exact
+              render={() => (
+                <Fragment>
+                  {signedIn &&
+                    !!wishlist && (
+                      <Wishlist
+                        products={wishlist.products}
+                        onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+                      />
+                    )}
+                </Fragment>
+              )}
+            />
+
+            <Route
+              path="/categories"
+              exact
+              render={() => (
+                <Fragment>
+                  {signedIn &&
+                    !!categories && (
+                      <CategoryList
+                        categories={categories}
+                        onChangeCategoryName={this.onCategoryNameChanged}
+                        onClickUpdateCategory={this.onCategoryUpdate}
+                        onClickDeleteCategory={this.onCategoryDelete}
+                      />
+                    )}
+                  {signedIn && (
+                    <CategoryForm
+                      onSubmitCreateCategory={this.onCategorySave}
+                    />
+                  )}
+                </Fragment>
+              )}
+            />
           </div>
         </div>
       </Router>
