@@ -674,7 +674,7 @@ class App extends Component {
 
   sections = {
     products: {
-      requireAuth: true,
+      requireAuth: false,
       load: listProducts,
     },
     wishlist: {
