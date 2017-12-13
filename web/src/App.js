@@ -1,5 +1,10 @@
 import React, { Component, Fragment } from 'react'
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch
+} from 'react-router-dom'
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
@@ -88,18 +93,19 @@ class App extends Component {
   }
 
   onSignUp = data => {
-    signUpNow(data).then(decodedToken => {
-      console.log('signed up', decodedToken)
-      this.setState(prevState => {
-        return {
-          decodedToken //,
-          // showSignUpForm: false
-        }
+    signUpNow(data)
+      .then(decodedToken => {
+        console.log('signed up', decodedToken)
+        this.setState(prevState => {
+          return {
+            decodedToken //,
+            // showSignUpForm: false
+          }
+        })
       })
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   resetProductForm = event => {
@@ -243,26 +249,28 @@ class App extends Component {
 
   onProductGet = productId => {
     // console.log('Getting product...', productId)
-    getProduct(productId).then(currentProduct => {
-      // console.log('Found product', currentProduct)
-      this.setState({
-        currentProduct
+    getProduct(productId)
+      .then(currentProduct => {
+        // console.log('Found product', currentProduct)
+        this.setState({
+          currentProduct
+        })
       })
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   onProductEdit = productId => {
-    getProduct(productId).then(currentProduct => {
-      this.setState({
-        currentProduct
+    getProduct(productId)
+      .then(currentProduct => {
+        this.setState({
+          currentProduct
+        })
       })
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   onProductDelete = productId => {
@@ -317,18 +325,19 @@ class App extends Component {
 
   onAddToWishlist = productID => {
     console.log('Adding to wishlist', productID)
-    addProductToWishlist(productID).then(newWishlist => {
-      console.log('Product added to wishlist', newWishlist)
-      this.setState(prevState => {
-        const wishlist = Object.assign({}, newWishlist)
-        return {
-          wishlist
-        }
+    addProductToWishlist(productID)
+      .then(newWishlist => {
+        console.log('Product added to wishlist', newWishlist)
+        this.setState(prevState => {
+          const wishlist = Object.assign({}, newWishlist)
+          return {
+            wishlist
+          }
+        })
       })
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   onRemoveFromWishlist = event => {
@@ -344,18 +353,19 @@ class App extends Component {
   }
 
   onCategorySave = data => {
-    addCategory(data).then(category => {
-      console.log('Category added', category)
-      this.setState(prevState => {
-        const categories = prevState.categories.concat(category)
-        return {
-          categories
-        }
+    addCategory(data)
+      .then(category => {
+        console.log('Category added', category)
+        this.setState(prevState => {
+          const categories = prevState.categories.concat(category)
+          return {
+            categories
+          }
+        })
       })
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   onCategoryDelete = categoryID => {
@@ -426,23 +436,22 @@ class App extends Component {
 
   onCategoryUpdate = categoryID => {
     const { categories } = this.state
-    const category = categories.filter(
-      c => c._id === categoryID
-    )[0]
-    updateCategory(category).then(result => {
-      console.log('Updated category', result)
-    })
-    .catch(error => {
-      this.setState({ error })
-    })
+    const category = categories.filter(c => c._id === categoryID)[0]
+    updateCategory(category)
+      .then(result => {
+        console.log('Updated category', result)
+      })
+      .catch(error => {
+        this.setState({ error })
+      })
   }
 
   render() {
     const {
       decodedToken,
-      products,
-      categories,
-      wishlist,
+      // products,
+      // categories,
+      // wishlist,
       currentProduct,
       error
     } = this.state
@@ -465,8 +474,6 @@ class App extends Component {
 
     const renderAlreadySignedIn = render => props =>
       !!signedIn ? <Redirect to="/products" /> : render(props)
-
-    const wishlistProducts = !!products && !!products.wishlist && products.wishlist
 
     return (
       <Router>
@@ -491,11 +498,11 @@ class App extends Component {
               render={() => (
                 <Fragment>
                   <PrimaryNav signedIn={signedIn} />
+                  {!!error && <Error error={error} />}
                 </Fragment>
               )}
             />
 
-            {!!error && <Error error={error} />}
             <Switch>
               <Route
                 path="/signin"
@@ -566,25 +573,25 @@ class App extends Component {
                 exact
                 render={() => (
                   <Fragment>
-                    {!!products ? (
+                    {/* {!!products ? ( */}
                       <ProductsList
-                        products={products}
-                        wishlist={wishlist}
-                        onClickGetProduct={this.onProductGet}
-                        onClickEditProduct={this.onProductEdit}
-                        onClickDeleteProduct={this.onProductDelete}
-                        onClickAddToWishlist={this.onAddToWishlist}
-                        onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+                        products={ this.dataForSection('products') }
+                        wishlist={ this.dataForSection('wishlist') }
+                        categories={ this.dataForSection('categories') }
+                        onClickGetProduct={signedIn && this.onProductGet}
+                        onClickEditProduct={signedIn && this.onProductEdit}
+                        onClickDeleteProduct={signedIn && this.onProductDelete}
+                        onClickAddToWishlist={signedIn && this.onAddToWishlist}
+                        onClickRemoveFromWishlist={signedIn && this.onRemoveFromWishlist}
                         onProductSave={this.onProductSave}
                         onProductFormCancel={this.resetProductForm}
                         currentProduct={currentProduct}
-                        categories={categories}
                         onInputChange={this.onInputChange}
                         onToggleCheckbox={this.onToggleCheckbox}
                       />
-                    ) : (
+                    {/* ) : (
                       !error && <span>Loading...</span>
-                    )}
+                    )} */}
                   </Fragment>
                 )}
               />
@@ -596,10 +603,10 @@ class App extends Component {
                   <Fragment>
                     {signedIn && (
                       <ProductForm
+                        categories={ this.dataForSection('categories') }
                         onProductSave={this.onProductSave}
                         onProductFormCancel={this.resetProductForm}
                         currentProduct={currentProduct}
-                        categories={categories}
                         onInputChange={this.onInputChange}
                         onToggleCheckbox={this.onToggleCheckbox}
                       />
@@ -614,16 +621,14 @@ class App extends Component {
                 render={requireAuth(() => (
                   <Fragment>
                     {signedIn &&
-                      (!!wishlist && (
-                        <Wishlist
-                          products={wishlist.products}
-                          wishlist={wishlist}
-                          onClickGetProduct={this.onProductGet}
-                          onClickEditProduct={this.onProductEdit}
-                          onClickDeleteProduct={this.onProductDelete}
-                          onClickRemoveFromWishlist={this.onRemoveFromWishlist}
-                        />
-                      ))}
+                      <Wishlist
+                        wishlist={ this.dataForSection('wishlist') }
+                        onClickGetProduct={this.onProductGet}
+                        onClickEditProduct={this.onProductEdit}
+                        onClickDeleteProduct={this.onProductDelete}
+                        onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+                      />
+                    }
                   </Fragment>
                 ))}
               />
@@ -634,14 +639,13 @@ class App extends Component {
                 render={requireAuth(() => (
                   <Fragment>
                     {signedIn &&
-                      !!categories && (
-                        <CategoryList
-                          categories={categories}
-                          onChangeCategoryName={this.onCategoryNameChanged}
-                          onClickUpdateCategory={this.onCategoryUpdate}
-                          onClickDeleteCategory={this.onCategoryDelete}
-                        />
-                      )}
+                      <CategoryList
+                        categories={ this.dataForSection('categories') }
+                        onChangeCategoryName={this.onCategoryNameChanged}
+                        onClickUpdateCategory={this.onCategoryUpdate}
+                        onClickDeleteCategory={this.onCategoryDelete}
+                      />
+                    }
                     {signedIn && (
                       <CategoryForm
                         onSubmitCreateCategory={this.onCategorySave}
@@ -650,16 +654,71 @@ class App extends Component {
                   </Fragment>
                 ))}
               />
-              
-              <Route render={ ({ location }) => (
-                <h2>Page not Found</h2>
-              )} />
+
+              <Route
+                render={({ location }) => {
+                  return (
+                    location.pathname !== '/' && (
+                      <h2>Page not Found: {location.pathname}</h2>
+                    )
+                  )
+                }}
+              />
               
             </Switch>
           </div>
         </div>
       </Router>
     )
+  }
+
+  sections = {
+    products: {
+      requireAuth: true,
+      load: listProducts,
+    },
+    wishlist: {
+      requireAuth: true,
+      load: listWishlistProducts,
+    },
+    categories: {
+      requireAuth: true,
+      load: listCategories,
+    }
+  }
+
+  loadSection(section) {
+    const { pending, requireAuth, load } = this.sections[section]
+    // If already loading
+    if (pending) {
+      return
+    }
+    // If requires authentication and not signed in
+    if (requireAuth && this.state.decodedToken == null) {
+      return
+    }
+    // If already loaded
+    if (this.state[section]) {
+      return
+    }
+    this.sections[section].pending = true
+    
+    load()
+      .then((data) => {
+        this.setState({
+          [section]: data
+        })
+      })
+      .catch((error) => {
+        this.setState({
+          error
+        })
+      })
+  }
+
+  dataForSection(section) {
+    this.loadSection(section)
+    return this.state[section]
   }
 
   loadWishlist = () => {
@@ -676,27 +735,27 @@ class App extends Component {
       })
   }
 
-  // WHen this App first appears on screen
-  componentDidMount() {
-    this.loadProductsList()
-    
-    const { decodedToken } = this.state
-    if (decodedToken) {
-      this.loadCategoriesList()
-      this.loadWishlist()
-    }
-  }
 
-  // When the state changes
-  componentDidUpdate(prevProps, prevState) {
-    // console.log('Component Updated')
-    // If the user token changes
-    if (this.state.decodedToken !== prevState.decodedToken) {
-      this.loadProductsList()
-      this.loadCategoriesList()
-      this.loadWishlist()
-    }
-  }
+  // // WHen this App first appears on screen
+  // componentDidMount() {
+  //   this.loadProductsList()
+
+  //   const { decodedToken } = this.state
+  //   if (decodedToken) {
+  //     this.loadCategoriesList()
+  //     this.loadWishlist()
+  //   }
+  // }
+
+  // // When the state changes
+  // componentDidUpdate(prevProps, prevState) {
+  //   // If the user token changes
+  //   if (this.state.decodedToken !== prevState.decodedToken) {
+  //     this.loadProductsList()
+  //     this.loadCategoriesList()
+  //     this.loadWishlist()
+  //   }
+  // }
 }
 
 export default App

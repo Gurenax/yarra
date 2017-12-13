@@ -9,7 +9,15 @@ router.get('/wishlist', requireJWT, (req, res) => {
   Wishlist.findOne({ user: req.user })
   // Once it has loaded these documents
   // Append product details to product id
-  .populate('products')
+  // .populate('products')
+  // Nested populate
+  .populate({
+      path: 'products',
+      populate: {
+        path: 'categories',
+        model: 'Category'
+      }
+    })
   .then(wishlist => {
     // Send them back as the response
     if(wishlist) {
@@ -62,7 +70,14 @@ router.post('/wishlist/products/:productID', requireJWT, (req, res) => {
     // new: true gives us the updated wishlist
     { upsert: true, new: true, runValidators: true })
     // Append product details to product id
-    .populate('products')
+    // Nested populate
+    .populate({
+      path: 'products',
+      populate: {
+        path: 'categories',
+        model: 'Category'
+      }
+    })
     .then(wishlist => {
       res.status(201).json({ products: wishlist.products })
     })
@@ -109,7 +124,13 @@ router.delete('/wishlist/products/:productID', requireJWT, (req, res) => {
     // new: true gives us the updated wishlist
     { upsert: true, new: true, runValidators: true })
     // Append product details to product id
-    .populate('products')
+    .populate({
+      path: 'products',
+      populate: {
+        path: 'categories',
+        model: 'Category'
+      }
+    })
     .then(wishlist => {
       res.status(200).json({ products: wishlist.products })
     })

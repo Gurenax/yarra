@@ -2,7 +2,6 @@ import React from 'react'
 import ProductItem from './ProductItem'
 
 const Wishlist = ({
-  products,
   wishlist,
   onClickGetProduct,
   onClickEditProduct,
@@ -27,15 +26,15 @@ const Wishlist = ({
             <th scope="col" />
             <th scope="col" />
             <th scope="col" />
-            <th scope="col" />
           </tr>
         </thead>
         <tbody>
         {
-          products.map( (product, index) => {
+          !!wishlist && (wishlist.products.map( (product, index) => {
             const inWishlist = productIDInWishlist(product._id)
             return (
               <ProductItem
+                key={`wishlist-${product._id}`}
                 product={product}
                 wishlist={wishlist}
                 index={index}
@@ -45,10 +44,11 @@ const Wishlist = ({
                 onClickRemoveFromWishlist={ inWishlist ? onClickRemoveFromWishlist : null }
               />
           )
-          })
+          }))
         }
         </tbody>
       </table>
+      { !wishlist && <p>Loading wishlist…</p> }
     </div>
   )
 }

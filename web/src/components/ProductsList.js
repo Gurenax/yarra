@@ -35,14 +35,14 @@ const ProductsList = ({
             <th scope="col" />
             <th scope="col" />
             <th scope="col" />
-            
           </tr>
         </thead>
         <tbody>
-          {products.map((product, index) => {
+          { products && (products.map((product, index) => {
             const inWishlist = productIDInWishlist(product._id)
             return (
               <ProductItem
+                key={product._id}
                 product={product}
                 wishlist={wishlist}
                 index={index}
@@ -53,9 +53,11 @@ const ProductsList = ({
                 onClickRemoveFromWishlist={inWishlist ? onClickRemoveFromWishlist : null}
               />
             )
-          })}
+          }))
+          }
         </tbody>
       </table>
+      { !products && <p>Loading products…</p> }
       <Link className="btn btn-primary" to="/products/admin">
         New Product
       </Link>
