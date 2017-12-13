@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import SignInForm from './components/SignInForm'
 import SignUpForm from './components/SignUpForm'
 import ProductsList from './components/ProductsList'
@@ -115,14 +115,6 @@ class App extends Component {
   }
 
   onProductSave = data => {
-    // if (!data.brandName || !data.name) {
-    //   this.setState({
-    //     errors: {
-    //       productSaveError: 'Invalid product'
-    //     }
-    //   })
-    //   return
-    // }
     console.log('Saving product..', data)
     data = { ...data, categories: this.state.currentProduct.categories }
     if (data.id) {
@@ -323,21 +315,6 @@ class App extends Component {
     }
   }
 
-  // toggleSignUp = event => {
-  //   console.log('Signing up..')
-  //   event.preventDefault()
-  //   // showSignUpForm()
-  //   this.setState(prevState => {
-  //     const signedUpShown = prevState.showSignUpForm
-  //     return {
-  //       showSignUpForm: !signedUpShown,
-  //       errors: {
-  //         signInError: ''
-  //       }
-  //     }
-  //   })
-  // }
-
   onAddToWishlist = productID => {
     console.log('Adding to wishlist', productID)
     addProductToWishlist(productID).then(newWishlist => {
@@ -489,6 +466,8 @@ class App extends Component {
     const renderAlreadySignedIn = render => props =>
       !!signedIn ? <Redirect to="/products" /> : render(props)
 
+    const wishlistProducts = !!products && !!products.wishlist && products.wishlist
+
     return (
       <Router>
         <div className="App">
@@ -517,81 +496,80 @@ class App extends Component {
             />
 
             {!!error && <Error error={error} />}
-
-            <Route
-              path="/signin"
-              exact
-              render={renderAlreadySignedIn(() => (
-                <Fragment>
-                  <div className="mt-3">
-                    <h2>Sign In</h2>
-                    <SignInForm
-                      onSignIn={this.onSignIn}
-                      // onRegister={this.toggleSignUp}
-                    />
-                  </div>
-                </Fragment>
-              ))}
-            />
-
-            <Route
-              path="/signup"
-              exact
-              render={renderAlreadySignedIn(() => (
-                <Fragment>
-                  <div className="mt-3">
-                    <h2>Sign Up</h2>
-                    <SignUpForm
-                      onSignUp={this.onSignUp}
-                      // onBackToSignIn={this.toggleSignUp}
-                    />
-                  </div>
-                </Fragment>
-              ))}
-            />
-
-            <Route
-              path="/account"
-              exact
-              render={requireAuth(() => (
-                <Fragment>
-                  {signedIn && (
-                    <div className="alert alert-success mt-3" role="alert">
-                      <h4 className="alert-heading">
-                        Signed in as: {decodedToken.email}
-                      </h4>
-                      <hr />
-                      <p>
-                        Signed in at:{' '}
-                        {new Date(decodedToken.iat * 1000).toISOString()}
-                      </p>
-                      <p className="mb-0">
-                        Expired at:{' '}
-                        {new Date(decodedToken.exp * 1000).toISOString()}
-                      </p>
-                      <hr />
-                      <button
-                        className="btn btn-success"
-                        onClick={this.onSignOut}
-                      >
-                        Sign Out
-                      </button>
+            <Switch>
+              <Route
+                path="/signin"
+                exact
+                render={renderAlreadySignedIn(() => (
+                  <Fragment>
+                    <div className="mt-3">
+                      <h2>Sign In</h2>
+                      <SignInForm
+                        onSignIn={this.onSignIn}
+                        // onRegister={this.toggleSignUp}
+                      />
                     </div>
-                  )}
-                </Fragment>
-              ))}
-            />
+                  </Fragment>
+                ))}
+              />
 
-            <Route
-              path="/products"
-              exact
-              render={requireAuth(() => (
-                <Fragment>
-                  {signedIn &&
-                    (!!products && !!wishlist ? (
+              <Route
+                path="/signup"
+                exact
+                render={renderAlreadySignedIn(() => (
+                  <Fragment>
+                    <div className="mt-3">
+                      <h2>Sign Up</h2>
+                      <SignUpForm
+                        onSignUp={this.onSignUp}
+                        // onBackToSignIn={this.toggleSignUp}
+                      />
+                    </div>
+                  </Fragment>
+                ))}
+              />
+
+              <Route
+                path="/account"
+                exact
+                render={requireAuth(() => (
+                  <Fragment>
+                    {signedIn && (
+                      <div className="alert alert-success mt-3" role="alert">
+                        <h4 className="alert-heading">
+                          Signed in as: {decodedToken.email}
+                        </h4>
+                        <hr />
+                        <p>
+                          Signed in at:{' '}
+                          {new Date(decodedToken.iat * 1000).toISOString()}
+                        </p>
+                        <p className="mb-0">
+                          Expired at:{' '}
+                          {new Date(decodedToken.exp * 1000).toISOString()}
+                        </p>
+                        <hr />
+                        <button
+                          className="btn btn-success"
+                          onClick={this.onSignOut}
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
+              />
+
+              <Route
+                path="/products"
+                exact
+                render={() => (
+                  <Fragment>
+                    {!!products ? (
                       <ProductsList
                         products={products}
-                        wishlist={wishlist.products}
+                        wishlist={wishlist}
                         onClickGetProduct={this.onProductGet}
                         onClickEditProduct={this.onProductEdit}
                         onClickDeleteProduct={this.onProductDelete}
@@ -605,74 +583,79 @@ class App extends Component {
                         onToggleCheckbox={this.onToggleCheckbox}
                       />
                     ) : (
-                      <span>Loading...</span>
-                    ))}
-                </Fragment>
-              ))}
-            />
+                      !error && <span>Loading...</span>
+                    )}
+                  </Fragment>
+                )}
+              />
 
-            <Route
-              path="/products/admin"
-              exact
-              render={requireAuth(() => (
-                <Fragment>
-                  {signedIn && (
-                    <ProductForm
-                      onProductSave={this.onProductSave}
-                      onProductFormCancel={this.resetProductForm}
-                      currentProduct={currentProduct}
-                      categories={categories}
-                      onInputChange={this.onInputChange}
-                      onToggleCheckbox={this.onToggleCheckbox}
-                    />
-                  )}
-                </Fragment>
-              ))}
-            />
-
-            <Route
-              path="/wishlist"
-              exact
-              render={requireAuth(() => (
-                <Fragment>
-                  {signedIn &&
-                    (!!wishlist && (
-                      <Wishlist
-                        products={wishlist.products}
-                        wishlist={wishlist.products}
-                        onClickGetProduct={this.onProductGet}
-                        onClickEditProduct={this.onProductEdit}
-                        onClickDeleteProduct={this.onProductDelete}
-                        onClickAddToWishlist={this.onAddToWishlist}
-                        onClickRemoveFromWishlist={this.onRemoveFromWishlist}
-                      />
-                    ))}
-                </Fragment>
-              ))}
-            />
-
-            <Route
-              path="/categories"
-              exact
-              render={requireAuth(() => (
-                <Fragment>
-                  {signedIn &&
-                    !!categories && (
-                      <CategoryList
+              <Route
+                path="/products/admin"
+                exact
+                render={requireAuth(() => (
+                  <Fragment>
+                    {signedIn && (
+                      <ProductForm
+                        onProductSave={this.onProductSave}
+                        onProductFormCancel={this.resetProductForm}
+                        currentProduct={currentProduct}
                         categories={categories}
-                        onChangeCategoryName={this.onCategoryNameChanged}
-                        onClickUpdateCategory={this.onCategoryUpdate}
-                        onClickDeleteCategory={this.onCategoryDelete}
+                        onInputChange={this.onInputChange}
+                        onToggleCheckbox={this.onToggleCheckbox}
                       />
                     )}
-                  {signedIn && (
-                    <CategoryForm
-                      onSubmitCreateCategory={this.onCategorySave}
-                    />
-                  )}
-                </Fragment>
-              ))}
-            />
+                  </Fragment>
+                ))}
+              />
+
+              <Route
+                path="/wishlist"
+                exact
+                render={requireAuth(() => (
+                  <Fragment>
+                    {signedIn &&
+                      (!!wishlist && (
+                        <Wishlist
+                          products={wishlist.products}
+                          wishlist={wishlist}
+                          onClickGetProduct={this.onProductGet}
+                          onClickEditProduct={this.onProductEdit}
+                          onClickDeleteProduct={this.onProductDelete}
+                          onClickRemoveFromWishlist={this.onRemoveFromWishlist}
+                        />
+                      ))}
+                  </Fragment>
+                ))}
+              />
+
+              <Route
+                path="/categories"
+                exact
+                render={requireAuth(() => (
+                  <Fragment>
+                    {signedIn &&
+                      !!categories && (
+                        <CategoryList
+                          categories={categories}
+                          onChangeCategoryName={this.onCategoryNameChanged}
+                          onClickUpdateCategory={this.onCategoryUpdate}
+                          onClickDeleteCategory={this.onCategoryDelete}
+                        />
+                      )}
+                    {signedIn && (
+                      <CategoryForm
+                        onSubmitCreateCategory={this.onCategorySave}
+                      />
+                    )}
+                  </Fragment>
+                ))}
+              />
+              
+              <Route render={ ({ location }) => (
+                <h2>Page not Found</h2>
+              )} />
+              
+            </Switch>
           </div>
         </div>
       </Router>
@@ -695,9 +678,10 @@ class App extends Component {
 
   // WHen this App first appears on screen
   componentDidMount() {
+    this.loadProductsList()
+    
     const { decodedToken } = this.state
     if (decodedToken) {
-      this.loadProductsList()
       this.loadCategoriesList()
       this.loadWishlist()
     }

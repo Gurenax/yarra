@@ -17,40 +17,50 @@ const ProductsList = ({
   onProductFormCancel,
   onInputChange,
   onToggleCheckbox
-}) => (
-  <div className="mt-3">
-    <h2>{!!products && products.length > 0 && products.length} Products</h2>
-    <table className="table">
-      <thead className="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Brand Name</th>
-          <th scope="col">Name</th>
-          <th scope="col">Category</th>
-          <th scope="col" />
-          <th scope="col" />
-          <th scope="col" />
-        </tr>
-      </thead>
-      <tbody>
-        {products.map((product, index) => (
-          <ProductItem
-            product={product}
-            wishlist={wishlist}
-            index={index}
-            onClickGetProduct={onClickGetProduct}
-            onClickEditProduct={onClickEditProduct}
-            onClickDeleteProduct={onClickDeleteProduct}
-            onClickAddToWishlist={onClickAddToWishlist}
-            onClickRemoveFromWishlist={onClickRemoveFromWishlist}
-          />
-        ))}
-      </tbody>
-    </table>
-    <Link className="btn btn-primary" to="/products/admin">
-      New Product
-    </Link>
-  </div>
-)
+}) => {
+  const productIDInWishlist = (productID) => {
+    if (!wishlist) return false
+    return wishlist.products.some((product) => product._id === productID)
+  }
+  return (
+    <div className="mt-3">
+      <h2>{!!products && products.length > 0 && products.length} Products</h2>
+      <table className="table">
+        <thead className="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Brand Name</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col" />
+            <th scope="col" />
+            <th scope="col" />
+            
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product, index) => {
+            const inWishlist = productIDInWishlist(product._id)
+            return (
+              <ProductItem
+                product={product}
+                wishlist={wishlist}
+                index={index}
+                onClickGetProduct={onClickGetProduct}
+                onClickEditProduct={onClickEditProduct}
+                onClickDeleteProduct={onClickDeleteProduct}
+                onClickAddToWishlist={!inWishlist ? onClickAddToWishlist : null}
+                onClickRemoveFromWishlist={inWishlist ? onClickRemoveFromWishlist : null}
+              />
+            )
+          })}
+        </tbody>
+      </table>
+      <Link className="btn btn-primary" to="/products/admin">
+        New Product
+      </Link>
+    </div>
+  )
+}
 
 export default ProductsList

@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/auth')
 const router = express.Router()
 
 // GET - Read all product
-router.get('/products', authMiddleware.requireJWT, (req, res) => {
+router.get('/products', (req, res) => {
   Product.find()
   // Once it has loaded these documents
   .populate('categories')

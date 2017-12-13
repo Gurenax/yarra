@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import ProductItem from './ProductItem'
 
 const Wishlist = ({
@@ -8,9 +7,13 @@ const Wishlist = ({
   onClickGetProduct,
   onClickEditProduct,
   onClickDeleteProduct,
-  onClickAddToWishlist,
   onClickRemoveFromWishlist
 }) => {
+  const productIDInWishlist = (productID) => {
+    if (!wishlist) return false
+    return wishlist.products.some((product) => product._id === productID)
+  }
+  
   return (
     <div className="mt-3">
       <h2>Wishlist</h2>
@@ -30,6 +33,7 @@ const Wishlist = ({
         <tbody>
         {
           products.map( (product, index) => {
+            const inWishlist = productIDInWishlist(product._id)
             return (
               <ProductItem
                 product={product}
@@ -38,15 +42,8 @@ const Wishlist = ({
                 onClickGetProduct={onClickGetProduct}
                 onClickEditProduct={onClickEditProduct}
                 onClickDeleteProduct={onClickDeleteProduct}
-                onClickAddToWishlist={onClickAddToWishlist}
-                onClickRemoveFromWishlist={onClickRemoveFromWishlist}
+                onClickRemoveFromWishlist={ inWishlist ? onClickRemoveFromWishlist : null }
               />
-            // <tr key={product._id}>
-            //   <th scope="row">{index+1}</th>
-            //   <td>{product.brandName}</td>
-            //   <td>{product.name}</td>
-            //   <td><button className="btn btn-primary" name={product._id} onClick={onClickRemoveFromWishlist}>Remove</button></td>
-            // </tr>
           )
           })
         }
