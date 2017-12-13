@@ -326,3 +326,20 @@ router.get('/products', authMiddleware.requireJWT, (req, res) => {
 ### Product
 - name: string
 - brandName: string
+
+
+## Finding Objects in Array
+Using `map` and `indexOf`
+```javascript
+const inWishlist = wishlist.map(val => val._id).indexOf(product._id) >= 0
+
+```
+Using `find`
+```javascript
+const inWishlist = wishlist.find(val => val._id === product._id)
+```
+
+Using `map` and `includes`
+```javascript
+const inWishlist = wishlist.map(val => val._id).includes(product._id)
+```
