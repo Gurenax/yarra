@@ -588,13 +588,15 @@ class App extends Component {
               render={requireAuth(() => (
                 <Fragment>
                   {signedIn &&
-                    (!!products ? (
+                    (!!products && !!wishlist ? (
                       <ProductsList
                         products={products}
+                        wishlist={wishlist.products}
                         onClickGetProduct={this.onProductGet}
                         onClickEditProduct={this.onProductEdit}
                         onClickDeleteProduct={this.onProductDelete}
                         onClickAddToWishlist={this.onAddToWishlist}
+                        onClickRemoveFromWishlist={this.onRemoveFromWishlist}
                         onProductSave={this.onProductSave}
                         onProductFormCancel={this.resetProductForm}
                         currentProduct={currentProduct}
@@ -637,6 +639,11 @@ class App extends Component {
                     (!!wishlist && (
                       <Wishlist
                         products={wishlist.products}
+                        wishlist={wishlist.products}
+                        onClickGetProduct={this.onProductGet}
+                        onClickEditProduct={this.onProductEdit}
+                        onClickDeleteProduct={this.onProductDelete}
+                        onClickAddToWishlist={this.onAddToWishlist}
                         onClickRemoveFromWishlist={this.onRemoveFromWishlist}
                       />
                     ))}
