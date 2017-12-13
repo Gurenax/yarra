@@ -8,7 +8,7 @@ const PrimaryNav = ({
     <nav className="primary">
       <ul className="nav nav-pills nav-fill">
         <li className="nav-item">
-          <Link className="nav-link" activeclassname="active" to='/'>
+          <Link className="nav-link" to='/'>
             Home
           </Link>
         </li>
