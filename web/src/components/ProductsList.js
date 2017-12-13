@@ -1,13 +1,16 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import ProductForm from './ProductForm'
+// import ProductForm from './ProductForm'
+import ProductItem from './ProductItem'
 
 const ProductsList = ({
   products,
+  wishlist,
   onClickGetProduct,
   onClickEditProduct,
   onClickDeleteProduct,
   onClickAddToWishlist,
+  onClickRemoveFromWishlist,
   currentProduct,
   categories,
   onProductSave,
@@ -31,52 +34,20 @@ const ProductsList = ({
       </thead>
       <tbody>
         {products.map((product, index) => (
-          <tr key={product._id}>
-            <th scope="row">{index + 1}</th>
-            <td>{product.brandName}</td>
-            <td>{product.name}</td>
-            <td>
-              {
-                product.categories.map( (category, index) => (
-                  <span key={product._id+category._id}>{index<product.categories.length-1 ? category.name+', ' : category.name}</span>
-                ))
-              }
-            </td>
-            <td>
-              {/* <button
-                className="btn btn-primary"
-                onClick={() => onClickEditProduct(product._id)}
-              >
-                Edit
-              </button> */}
-              <Link to='/products/admin'
-                className="btn btn-primary"
-                onClick={() => onClickEditProduct(product._id)}
-              >
-                Edit
-              </Link>
-            </td>
-            <td>
-              <button
-                className="btn btn-primary"
-                onClick={() => onClickDeleteProduct(product._id)}
-              >
-                Delete
-              </button>
-            </td>
-            <td>
-              <button
-                className="btn btn-primary"
-                onClick={() => onClickAddToWishlist(product._id)}
-              >
-                Add to Wishlist
-              </button>
-            </td>
-          </tr>
+          <ProductItem
+            product={product}
+            wishlist={wishlist}
+            index={index}
+            onClickGetProduct={onClickGetProduct}
+            onClickEditProduct={onClickEditProduct}
+            onClickDeleteProduct={onClickDeleteProduct}
+            onClickAddToWishlist={onClickAddToWishlist}
+            onClickRemoveFromWishlist={onClickRemoveFromWishlist}
+          />
         ))}
       </tbody>
     </table>
-    <Link className="btn btn-primary" to='/products/admin'>
+    <Link className="btn btn-primary" to="/products/admin">
       New Product
     </Link>
   </div>
