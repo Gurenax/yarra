@@ -343,3 +343,76 @@ Using `map` and `includes`
 ```javascript
 const inWishlist = wishlist.map(val => val._id).includes(product._id)
 ```
+
+Using `some`
+```javascript
+const inWishlist = wishlist.products.some((product) => product._id === productID)
+```
+
+## Deployment
+1. `yarn add now --dev`
+2. Login to Zeit
+```
+./node_modules/.bin/now login
+```
+
+3. Zeit will send a verification
+4. Verify in e-mail
+5. Register in MLAB, create an account
+6. Create a database
+7. Create a user
+8. Add in server.js
+```javascript
+// Load .env file in development
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+```
+
+9. In API, Create .env file
+```javascript
+MONGO_URI = mongodb://localhost/yarra
+JWT_SECRET = xxxxxxx
+JWT_ALGORITHM = HS256
+JWT_EXPIRATION = 7 days
+```
+
+10. In API, Create production.env file
+```javascript
+MONGO_URI = mongodb://xxxxxxx
+JWT_SECRET = xxxxxxx
+JWT_ALGORITHM = HS256
+JWT_EXPIRATION = 7 days
+```
+
+11. In API, model/init.js, change the connect URI to
+```javascript
+process.env.MONGO_URI,
+```
+
+12. Ensure that package.json scripts include
+```
+"start": "node server.js"
+```
+
+13. Deploy
+```
+./node_modules/.bin/now -E production.env
+```
+
+14. In WEB, Create .env.local file
+```
+REACT_APP_API_URL = http://localhost:7000
+```
+
+15.  In WEB, Create .env.production file
+```
+REACT_APP_API_URL = https://yarra-api-gurenax.now.sh
+```
+
+16. In WEB, change init.js baseurl to
+```javascript
+baseURL: process.env.REACT_APP_API_URL,
+```
+
+17. Restart the (WEB) React server
