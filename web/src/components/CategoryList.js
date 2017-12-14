@@ -20,7 +20,7 @@ const CategoryList = ({
           </tr>
         </thead>
         <tbody>
-          {!!categories ? (categories.map((category, index) => (
+          {!!categories && (categories.map((category, index) => (
             <tr key={category._id}>
               <th scope="row">{index + 1}</th>
               <td><input type="text" value={category.name} name={index} onChange={onChangeCategoryName} /></td>
@@ -42,12 +42,11 @@ const CategoryList = ({
                 </button>
               </td>
             </tr>
-          ))) : (
-            <p>Loading categories...</p>
-          )
+          )))
         }
         </tbody>
       </table>
+      {!categories && <p>Loading categories...</p>}
     </div>
   )
 }
