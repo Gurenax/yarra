@@ -299,6 +299,7 @@ class App extends Component {
       })
       .then(() => {
         this.loadCategoriesList()
+        this.loadWishlist()
       })
       .catch(error => {
         this.setState({ error })
@@ -385,6 +386,7 @@ class App extends Component {
       })
       .then(() => {
         this.loadProductsList()
+        this.loadWishlist()
       })
       .catch(error => {
         this.setState({ error })
@@ -442,6 +444,12 @@ class App extends Component {
     updateCategory(category)
       .then(result => {
         console.log('Updated category', result)
+      })
+      .then(() => {
+        // Reload products list
+        this.loadProductsList()
+        // Reload wishlist
+        this.loadWishlist()
       })
       .catch(error => {
         this.setState({ error })
