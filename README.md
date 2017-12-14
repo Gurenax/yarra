@@ -416,3 +416,29 @@ baseURL: process.env.REACT_APP_API_URL,
 ```
 
 17. Restart the (WEB) React server
+
+18. Deploy yarra (master) in Netlify as Github repo
+
+19. Specify Basic build settings, `build command`
+```
+cd web && npm install && npm run build
+```
+
+20. Specify the `publish directory`
+```
+web/build
+```
+
+21. Deploy Site
+
+22. Change Site Name in General > Site Details > Change site name
+
+23. In WEB, add _redirects file in
+```
+/*  /index.html 200
+```
+
+24. In WEB, change package.json build script to
+```javascript
+"build": "react-scripts build && cp _redirects build/_redirects",
+```
