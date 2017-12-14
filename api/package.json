@@ -16,12 +16,16 @@
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
-    "nodemon": "^1.12.5"
+    "nodemon": "^1.12.5",
+    "now": "^8.5.4"
   },
   "scripts": {
     "dev": "nodemon server.js",
     "seed": "node models/seeds.js",
     "drop": "node models/drop.js",
-    "reset": "npm run drop && npm run seed"
+    "reset": "npm run drop && npm run seed",
+    "start": "node server.js",
+    "now": "now",
+    "deploy": "now -E production.env"
   }
 }
