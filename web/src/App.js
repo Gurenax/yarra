@@ -166,6 +166,8 @@ class App extends Component {
         .then(() => {
           // Reload categories list
           this.loadCategoriesList()
+          // Reload wishlist
+          this.loadWishlist()
         })
         .catch(error => {
           this.setState({ error })
