@@ -8,14 +8,15 @@ const productSchema = new Schema({
   categories: [{ type: Schema.ObjectId, ref: 'Category', default: [] }]
 })
 
-productSchema.pre('remove', next => {
-  Category.update(
-      { products : { $in : this._id } }, 
-      { $pull: { products: this._id } },
-      { multi: true })  //if reference exists in multiple documents 
-  .exec();
-  next()
-})
+// productSchema.pre('remove', next => {
+//   console.log('PRODUCT PRE REMOVE')
+//   Category.update(
+//       { products : { $in : this._id } }, 
+//       { $pull: { products: this._id } },
+//       { multi: true })  //if reference exists in multiple documents 
+//   .exec()
+//   next()
+// })
 
 const Product = mongoose.model('Product', productSchema)
 
